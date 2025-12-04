@@ -223,7 +223,7 @@ function App() {
         doc.setFontSize(14);
         doc.text("Equipamento", 120, 120); // Coluna direita
         doc.setFontSize(10);
-        charToExport.equipment.forEach((item, i) => {
+        charToExport.equipment.forEach((item: string, i: number) => {
             doc.text(`• ${item}`, 120, 130 + (i * 6));
         });
     }
@@ -483,7 +483,7 @@ function App() {
                                             <Backpack size={16} /> Equipamento
                                         </h3>
                                         <ul className="text-sm text-slate-700 list-disc list-inside">
-                                            {character.equipment.map((item, idx) => (
+                                            {character.equipment.map((item: string, idx: number) => (
                                                 <li key={idx}>{item}</li>
                                             ))}
                                         </ul>
