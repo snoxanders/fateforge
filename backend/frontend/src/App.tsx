@@ -35,7 +35,7 @@ function App() {
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedLevel, setSelectedLevel] = useState(1);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001' : '');
 
   // Dados estáticos para dropdowns (Idealmente viria do backend)
   const racesList = [
