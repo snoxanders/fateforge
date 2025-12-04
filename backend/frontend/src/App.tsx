@@ -18,6 +18,7 @@ interface Character {
   background: { name: string; description: string };
   personality: { trait: string; ideal: string; bond: string; flaw: string };
   spells?: { cantrips: string[]; level1: string[] };
+  equipment?: string[];
   createdAt?: string;
 }
 
