@@ -34,6 +34,8 @@ function App() {
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedLevel, setSelectedLevel] = useState(1);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
   // Dados estáticos para dropdowns (Idealmente viria do backend)
   const racesList = [
       { id: 'human', name: 'Humano' },
@@ -68,7 +70,7 @@ function App() {
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3001/api/generate', {
+      const response = await axios.post(`${API_URL}/api/generate`, {
         name: name || undefined,
         level: selectedLevel,
         method: 'roll',
@@ -89,7 +91,7 @@ function App() {
     if (!character) return;
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3001/api/reroll', {
+      const response = await axios.post(`${API_URL}/api/reroll`, {
         character,
         target
       });
