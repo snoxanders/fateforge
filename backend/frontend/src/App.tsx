@@ -42,9 +42,13 @@ function App() {
       { id: 'human', name: 'Humano' },
       { id: 'elf-high', name: 'Alto Elfo' },
       { id: 'dwarf-hill', name: 'Anão da Colina' },
+      { id: 'dwarf-mountain', name: 'Anão da Montanha' },
       { id: 'halfling-lightfoot', name: 'Halfling' },
       { id: 'half-orc', name: 'Meio-Orc' },
-      { id: 'tiefling', name: 'Tiefling' }
+      { id: 'tiefling', name: 'Tiefling' },
+      { id: 'gnome-rock', name: 'Gnomo das Rochas' },
+      { id: 'half-elf', name: 'Meio-Elfo' },
+      { id: 'dragonborn', name: 'Draconato' }
   ];
   
   const classesList = [
@@ -53,7 +57,13 @@ function App() {
       { id: 'rogue', name: 'Ladino' },
       { id: 'cleric', name: 'Clérigo' },
       { id: 'bard', name: 'Bardo' },
-      { id: 'paladin', name: 'Paladino' }
+      { id: 'paladin', name: 'Paladino' },
+      { id: 'barbarian', name: 'Bárbaro' },
+      { id: 'ranger', name: 'Patrulheiro' },
+      { id: 'sorcerer', name: 'Feiticeiro' },
+      { id: 'monk', name: 'Monge' },
+      { id: 'warlock', name: 'Bruxo' },
+      { id: 'druid', name: 'Druida' }
   ];
 
   // Carregar salvos ao iniciar
@@ -135,6 +145,10 @@ function App() {
         case 'Halfling Pés-Leves': return "/assets/races/halfling.png";
         case 'Meio-Orc': return "/assets/races/orc.png";
         case 'Tiefling': return "/assets/races/tiefling.png";
+        case 'Anão da Montanha': return "/assets/races/dwarf.png";
+        case 'Gnomo das Rochas': return "/assets/races/gnome.png";
+        case 'Meio-Elfo': return "/assets/races/half-elf.png";
+        case 'Draconato': return "/assets/races/dragonborn.png";
         default: return "/assets/races/human.png";
     }
   };

@@ -177,5 +177,177 @@ export const CLASSES: Class[] = [
       { name: 'Sentido Divino', level: 1, description: 'A presença de um mal forte registra em seus sentidos como um odor nocivo.' },
       { name: 'Cura pelas Mãos', level: 1, description: 'Seu toque abençoado pode curar ferimentos.' }
     ]
+  },
+  {
+    id: 'barbarian',
+    name: 'Bárbaro',
+    hitDie: 12,
+    statPriority: ['STR', 'CON', 'DEX', 'WIS', 'CHA', 'INT'],
+    startingEquipment: [
+        'Machado Grande (1d12 cortante)',
+        'Duas machadinhas',
+        'Pacote de Explorador',
+        '4 Azagaias'
+    ],
+    proficiencies: {
+      armor: ['Armaduras leves', 'Armaduras médias', 'Escudos'],
+      weapons: ['Armas simples', 'Armas marciais'],
+      tools: [],
+      savingThrows: ['STR', 'CON'],
+      skills: {
+        choose: 2,
+        from: ['Adestrar Animais', 'Atletismo', 'Intimidação', 'Natureza', 'Percepção', 'Sobrevivência']
+      }
+    },
+    features: [
+      { name: 'Fúria', level: 1, description: 'Em batalha, você luta com uma ferocidade primitiva.' },
+      { name: 'Defesa Sem Armadura', level: 1, description: 'Quando você não estiver vestindo nenhuma armadura, sua CA será 10 + mod. Destreza + mod. Constituição.' }
+    ]
+  },
+  {
+    id: 'ranger',
+    name: 'Patrulheiro (Ranger)',
+    hitDie: 10,
+    statPriority: ['DEX', 'WIS', 'CON', 'STR', 'INT', 'CHA'],
+    startingEquipment: [
+        'Armadura de Couro Batido (AC 12+Dex)',
+        'Duas Espadas Curtas (1d6 perfurante)',
+        'Arco Longo e 20 flechas',
+        'Pacote de Explorador'
+    ],
+    proficiencies: {
+      armor: ['Armaduras leves', 'Armaduras médias', 'Escudos'],
+      weapons: ['Armas simples', 'Armas marciais'],
+      tools: [],
+      savingThrows: ['STR', 'DEX'],
+      skills: {
+        choose: 3,
+        from: ['Adestrar Animais', 'Atletismo', 'Furtividade', 'Intuição', 'Investigação', 'Natureza', 'Percepção', 'Sobrevivência']
+      }
+    },
+    features: [
+      { name: 'Inimigo Favorito', level: 1, description: 'Você estuda, rastreia, caça e até mesmo fala com um certo tipo de inimigo.' },
+      { name: 'Explorador Natural', level: 1, description: 'Você é um mestre em navegar pelo mundo natural.' }
+    ]
+  },
+  {
+    id: 'sorcerer',
+    name: 'Feiticeiro',
+    hitDie: 6,
+    statPriority: ['CHA', 'CON', 'DEX', 'WIS', 'INT', 'STR'],
+    spellcasting: {
+        ability: 'CHA',
+        cantripsKnown: 4,
+        spellsKnown: 2
+    },
+    startingEquipment: [
+        'Besta Leve e 20 virotes',
+        'Foco Arcano',
+        'Pacote de Aventureiro',
+        'Duas Adagas'
+    ],
+    proficiencies: {
+      armor: [],
+      weapons: ['Adagas', 'Dardos', 'Fundas', 'Bordões', 'Bestas leves'],
+      tools: [],
+      savingThrows: ['CON', 'CHA'],
+      skills: {
+        choose: 2,
+        from: ['Arcanismo', 'Enganação', 'Intuição', 'Intimidação', 'Persuasão', 'Religião']
+      }
+    },
+    features: [
+      { name: 'Origem de Feitiçaria', level: 1, description: 'Escolha uma origem de feitiçaria, que descreve a fonte do seu poder mágico inato.' },
+      { name: 'Conjuração', level: 1, description: 'O poder da magia corre em suas veias.' }
+    ]
+  },
+  {
+    id: 'monk',
+    name: 'Monge',
+    hitDie: 8,
+    statPriority: ['DEX', 'WIS', 'CON', 'STR', 'INT', 'CHA'],
+    startingEquipment: [
+        'Espada Curta (1d6 perfurante)',
+        'Pacote de Aventureiro',
+        '10 Dardos'
+    ],
+    proficiencies: {
+      armor: [],
+      weapons: ['Armas simples', 'Espadas curtas'],
+      tools: ['Um tipo de ferramenta de artesão ou instrumento musical'],
+      savingThrows: ['STR', 'DEX'],
+      skills: {
+        choose: 2,
+        from: ['Acrobacia', 'Atletismo', 'Furtividade', 'História', 'Intuição', 'Religião']
+      }
+    },
+    features: [
+      { name: 'Defesa Sem Armadura', level: 1, description: 'Quando não estiver usando armadura nem escudo, sua CA é 10 + mod. Destreza + mod. Sabedoria.' },
+      { name: 'Artes Marciais', level: 1, description: 'Sua prática de artes marciais lhe dá domínio do estilo de combate desarmado e com armas de monge.' }
+    ]
+  },
+  {
+    id: 'warlock',
+    name: 'Bruxo',
+    hitDie: 8,
+    statPriority: ['CHA', 'CON', 'DEX', 'WIS', 'INT', 'STR'],
+    spellcasting: {
+        ability: 'CHA',
+        cantripsKnown: 2,
+        spellsKnown: 2
+    },
+    startingEquipment: [
+        'Besta Leve e 20 virotes',
+        'Foco Arcano',
+        'Armadura de Couro (AC 11+Dex)',
+        'Arma Simples',
+        'Duas Adagas'
+    ],
+    proficiencies: {
+      armor: ['Armaduras leves'],
+      weapons: ['Armas simples'],
+      tools: [],
+      savingThrows: ['WIS', 'CHA'],
+      skills: {
+        choose: 2,
+        from: ['Arcanismo', 'Enganação', 'História', 'Intimidação', 'Investigação', 'Natureza', 'Religião']
+      }
+    },
+    features: [
+      { name: 'Patrono Sobrenatural', level: 1, description: 'Você firmou um pacto com um ser extraplanar.' },
+      { name: 'Magia de Pacto', level: 1, description: 'Sua pesquisa arcana e a magia concedida a você pelo seu patrono lhe deram facilidade com magias.' }
+    ]
+  },
+  {
+    id: 'druid',
+    name: 'Druida',
+    hitDie: 8,
+    statPriority: ['WIS', 'CON', 'DEX', 'STR', 'INT', 'CHA'],
+    spellcasting: {
+        ability: 'WIS',
+        cantripsKnown: 2,
+        spellsKnown: 4 // WIS mod + Level (aprox)
+    },
+    startingEquipment: [
+        'Escudo de Madeira (+2 AC)',
+        'Cimitarra (1d6 cortante)',
+        'Armadura de Couro (AC 11+Dex)',
+        'Foco Druídico',
+        'Pacote de Explorador'
+    ],
+    proficiencies: {
+      armor: ['Armaduras leves', 'Armaduras médias', 'Escudos (apenas madeira)'],
+      weapons: ['Clavas', 'Adagas', 'Dardos', 'Azagaias', 'Maças', 'Bordões', 'Cimitarras', 'Foices', 'Fundas', 'Lanças'],
+      tools: ['Kit de Herbalismo'],
+      savingThrows: ['INT', 'WIS'],
+      skills: {
+        choose: 2,
+        from: ['Adestrar Animais', 'Arcanismo', 'Intuição', 'Medicina', 'Natureza', 'Percepção', 'Religião', 'Sobrevivência']
+      }
+    },
+    features: [
+      { name: 'Druídico', level: 1, description: 'Você conhece o idioma secreto dos druidas.' },
+      { name: 'Conjuração', level: 1, description: 'Extraindo a essência divina da própria natureza, você pode conjurar magias.' }
+    ]
   }
 ];

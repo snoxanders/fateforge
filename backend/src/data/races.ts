@@ -78,5 +78,59 @@ export const RACES: Race[] = [
       { name: 'Legado Infernal', description: 'Você conhece o truque taumaturgia.' }
     ],
     languages: ['Comum', 'Infernal']
+  },
+  {
+    id: 'gnome-rock',
+    name: 'Gnomo das Rochas',
+    subrace: 'Gnomo das Rochas',
+    speed: 25,
+    size: 'Small',
+    abilityBonuses: { INT: 2, CON: 1 },
+    traits: [
+      { name: 'Visão no Escuro', description: 'Acostumado à vida subterrânea, você tem uma visão superior no escuro e na penumbra.' },
+      { name: 'Esperteza Gnômica', description: 'Você tem vantagem em testes de resistência de Inteligência, Sabedoria e Carisma contra magia.' },
+      { name: 'Conhecimento de Artífice', description: 'Sempre que você fizer um teste de História relacionado a itens mágicos, objetos alquímicos ou dispositivos tecnológicos, você pode adicionar o dobro do seu bônus de proficiência.' }
+    ],
+    languages: ['Comum', 'Gnomo']
+  },
+  {
+    id: 'half-elf',
+    name: 'Meio-Elfo',
+    speed: 30,
+    size: 'Medium',
+    abilityBonuses: { CHA: 2, DEX: 1, CON: 1 }, // DEX e CON como sugestão de +1 flexível
+    traits: [
+      { name: 'Visão no Escuro', description: 'Graças ao seu sangue élfico, você tem uma visão superior no escuro e na penumbra.' },
+      { name: 'Ancestralidade Feérica', description: 'Você tem vantagem em testes de resistência contra ser enfeitiçado e magia não pode colocá-lo para dormir.' },
+      { name: 'Versatilidade em Perícia', description: 'Você ganha proficiência em duas perícias, à sua escolha.' }
+    ],
+    languages: ['Comum', 'Élfico', 'Um idioma extra à escolha']
+  },
+  {
+    id: 'dragonborn',
+    name: 'Draconato',
+    speed: 30,
+    size: 'Medium',
+    abilityBonuses: { STR: 2, CHA: 1 },
+    traits: [
+      { name: 'Ancestralidade Dracônica', description: 'Você possui ancestralidade dracônica. Escolha um tipo de dragão (Fogo, Gelo, etc).' },
+      { name: 'Ataque de Sopro', description: 'Você pode usar sua ação para exalar energia destrutiva baseada na sua ancestralidade dracônica.' },
+      { name: 'Resistência a Dano', description: 'Você possui resistência ao tipo de dano associado à sua ancestralidade dracônica.' }
+    ],
+    languages: ['Comum', 'Dracônico']
+  },
+  {
+    id: 'dwarf-mountain',
+    name: 'Anão da Montanha',
+    subrace: 'Anão da Montanha',
+    speed: 25,
+    size: 'Medium',
+    abilityBonuses: { CON: 2, STR: 2 },
+    traits: [
+      { name: 'Visão no Escuro', description: 'Acostumado à vida subterrânea, você tem visão superior em condições de escuridão e penumbra.' },
+      { name: 'Resiliência Anã', description: 'Você tem vantagem em testes de resistência contra veneno e resistência contra dano de veneno.' },
+      { name: 'Treinamento Anão em Armaduras', description: 'Você tem proficiência em armaduras leves e médias.' }
+    ],
+    languages: ['Comum', 'Anão']
   }
 ];
