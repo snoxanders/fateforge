@@ -27,6 +27,11 @@ export class CharacterGeneratorService {
     // 4. Aplicar Bônus Raciais
     stats = this.applyRaceBonuses(stats, race);
 
+    // 4.5 Aplicar ASI (Ability Score Improvement) se level >= 4
+    if (level >= 4) {
+        stats = this.applyASI(stats, characterClass);
+    }
+
     // 5. Calcular Modificadores e Derivados
     const modifiers = this.calculateModifiers(stats);
     const hp = this.calculateHP(characterClass, modifiers.CON, level, race);
@@ -132,40 +137,36 @@ export class CharacterGeneratorService {
   }
 
   private assignStatsByClassPriority(values: number[], charClass: Class): Stats {
-    // Clone values para não mutar o original se reutilizado
     const sortedValues = [...values].sort((a, b) => b - a);
-    
     const stats: Stats = { STR: 0, DEX: 0, CON: 0, INT: 0, WIS: 0, CHA: 0 };
-    const statKeys: (keyof Stats)[] = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
-    
-    // Atribuir valores mais altos para stats primários
-    const primaryStats = charClass.primaryStats as (keyof Stats)[];
-    
-    primaryStats.forEach(stat => {
-      if (sortedValues.length > 0) {
-        stats[stat] = sortedValues.shift()!;
-      }
-    });
+    const priority = charClass.statPriority as (keyof Stats)[];
 
-    // Preencher o resto aleatoriamente ou em ordem
-    // Para MVP, vamos preencher aleatoriamente os restantes para dar variedade
-    const remainingStats = statKeys.filter(k => !primaryStats.includes(k));
-    
-    // Shuffle remaining stats keys to distribute remaining values randomly
-    /* 
-       Nota: Em D&D otimizado, haveria prioridades secundárias e terciárias.
-       Ex: Wizard quer INT > CON > DEX > WIS > CHA > STR.
-       Para este MVP, randomizamos os não-primários.
-    */
-    remainingStats.sort(() => Math.random() - 0.5);
-
-    remainingStats.forEach(stat => {
-      if (sortedValues.length > 0) {
-        stats[stat] = sortedValues.shift()!;
-      }
+    priority.forEach(stat => {
+        if (sortedValues.length > 0) {
+            stats[stat] = sortedValues.shift()!;
+        }
     });
 
     return stats;
+  }
+
+  private applyASI(stats: Stats, charClass: Class): Stats {
+    const newStats = { ...stats };
+    const priority = charClass.statPriority as (keyof Stats)[];
+    let pointsToDistribute = 2;
+
+    for (const stat of priority) {
+        if (pointsToDistribute <= 0) break;
+
+        const currentVal = newStats[stat];
+        if (currentVal < 20) {
+            const canAdd = Math.min(20 - currentVal, pointsToDistribute);
+            newStats[stat] += canAdd;
+            pointsToDistribute -= canAdd;
+        }
+    }
+
+    return newStats;
   }
 
   private applyRaceBonuses(stats: Stats, race: Race): Stats {

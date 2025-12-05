@@ -5,7 +5,7 @@ export const CLASSES: Class[] = [
     id: 'fighter',
     name: 'Guerreiro',
     hitDie: 10,
-    primaryStats: ['STR', 'CON'],
+    statPriority: ['STR', 'CON', 'DEX', 'WIS', 'CHA', 'INT'],
     startingEquipment: [
         'Cota de Malha (AC 16)',
         'Espada Longa (1d8 cortante)',
@@ -32,7 +32,7 @@ export const CLASSES: Class[] = [
     id: 'wizard',
     name: 'Mago',
     hitDie: 6,
-    primaryStats: ['INT', 'CON'],
+    statPriority: ['INT', 'CON', 'DEX', 'WIS', 'CHA', 'STR'],
     spellcasting: {
         ability: 'INT',
         cantripsKnown: 3,
@@ -63,7 +63,7 @@ export const CLASSES: Class[] = [
     id: 'rogue',
     name: 'Ladino',
     hitDie: 8,
-    primaryStats: ['DEX', 'INT', 'CHA'],
+    statPriority: ['DEX', 'CON', 'WIS', 'CHA', 'INT', 'STR'],
     startingEquipment: [
         'Rapieira (1d8 perfurante)',
         'Arco Curto e 20 flechas',
@@ -91,7 +91,7 @@ export const CLASSES: Class[] = [
     id: 'cleric',
     name: 'Clérigo',
     hitDie: 8,
-    primaryStats: ['WIS', 'CON', 'STR'],
+    statPriority: ['WIS', 'CON', 'STR', 'DEX', 'CHA', 'INT'],
     spellcasting: {
         ability: 'WIS',
         cantripsKnown: 3,
@@ -123,7 +123,7 @@ export const CLASSES: Class[] = [
     id: 'bard',
     name: 'Bardo',
     hitDie: 8,
-    primaryStats: ['CHA', 'DEX'],
+    statPriority: ['CHA', 'DEX', 'CON', 'WIS', 'INT', 'STR'],
     spellcasting: {
         ability: 'CHA',
         cantripsKnown: 2,
@@ -155,7 +155,7 @@ export const CLASSES: Class[] = [
     id: 'paladin',
     name: 'Paladino',
     hitDie: 10,
-    primaryStats: ['STR', 'CHA', 'CON'],
+    statPriority: ['STR', 'CHA', 'CON', 'WIS', 'DEX', 'INT'],
     startingEquipment: [
         'Espada Longa (1d8 cortante)',
         'Escudo (+2 AC)',

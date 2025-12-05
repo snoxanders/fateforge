@@ -2,7 +2,7 @@ export interface Class {
   id: string;
   name: string;
   hitDie: 6 | 8 | 10 | 12;
-  primaryStats: string[]; 
+  statPriority: ('STR' | 'DEX' | 'CON' | 'INT' | 'WIS' | 'CHA')[]; 
   spellcasting?: {
     ability: 'INT' | 'WIS' | 'CHA';
     cantripsKnown: number; 
