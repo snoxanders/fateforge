@@ -47,7 +47,7 @@ export class DatabaseService {
         orderBy: { createdAt: 'desc' }
     });
 
-    return records.map(record => ({
+    return records.map((record: any) => ({
         id: record.id,
         name: record.name,
         level: record.level,
