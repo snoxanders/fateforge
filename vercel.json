@@ -1,4 +1,6 @@
 {
+  "version": 2,
+  "outputDirectory": "backend/frontend/dist",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" }
   ]
