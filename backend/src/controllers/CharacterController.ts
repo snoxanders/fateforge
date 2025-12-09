@@ -8,7 +8,6 @@ export class CharacterController {
         try {
             const { name, level, method, raceId, classId } = req.body;
             
-            // Validações básicas
             if (level < 1 || level > 20) {
                  res.status(400).json({ error: "Level must be between 1 and 20" });
                  return;
@@ -32,11 +31,7 @@ export class CharacterController {
     static reroll(req: Request, res: Response) {
         try {
             const { character, target } = req.body;
-            // TODO: Implementar lógica real de re-roll parcial
-            // Por enquanto, gera um novo completo como placeholder se for complexo
-            // Mas o ideal é refazer apenas a parte solicitada no Service.
             
-            // Simplificação para MVP: Gerar novo com mesmos parâmetros base
             const generator = new CharacterGeneratorService();
             const newChar = generator.generateCharacter(character.name, {
                 level: character.level,
@@ -44,11 +39,8 @@ export class CharacterController {
                 classId: target === 'class' ? undefined : character.class.id
             });
             
-            // Preservar o que não mudou
             if (target === 'stats') {
-                // Mantém raça e classe, muda stats
-                // Como generateCharacter já gera stats novos, ok.
-                // Precisaríamos injetar a raça/classe antiga se quiséssemos manter exatamente igual.
+                // Logic to preserve race/class if needed
             }
             
             res.json(newChar);

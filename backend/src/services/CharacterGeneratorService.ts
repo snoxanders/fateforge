@@ -14,63 +14,46 @@ export class CharacterGeneratorService {
   public generateCharacter(name: string, preferences: GenerationPreferences = {}): Character {
     const level = preferences.level || 1;
     
-    // 1. Selecionar Raça e Classe
     const race = this.selectRace(preferences.raceId);
     let characterClass = this.selectClass(preferences.classId);
     let subclass: Subclass | undefined = undefined;
 
-    // Lógica de Subclasse: geralmente escolhida no nível 3 (ou 1/2 para alguns, simplificado para 3 ou se disponível)
-    // Para simplificar, se nível >= 3 e a classe tiver subclasses, escolhe uma.
     if (level >= 3 && characterClass.subclasses && characterClass.subclasses.length > 0) {
         subclass = this.pickRandom(characterClass.subclasses, 1)[0];
     }
 
-    // Acumular Features (Classe + Subclasse) até o nível atual
     const activeFeatures: ClassFeature[] = [];
     
-    // Features de Classe base
     characterClass.features.forEach(feat => {
         if (feat.level <= level) activeFeatures.push(feat);
     });
 
-    // Features de Subclasse
     if (subclass) {
         subclass.features.forEach(feat => {
             if (feat.level <= level) activeFeatures.push(feat);
         });
     }
 
-    // Atualiza a classe no objeto final para ter apenas as features ativas (visualização mais limpa na ficha)
-    // Mas mantemos a referência original para cálculos se precisar
     const displayClass = { ...characterClass, features: activeFeatures };
 
-    // 2. Gerar Atributos Base
     let baseStatsValues = this.generateBaseStats(preferences.method || 'roll');
 
-    // 3. Mapear Atributos Base para Stats
     let stats = this.assignStatsByClassPriority(baseStatsValues, characterClass);
 
-    // 4. Aplicar Bônus Raciais
     stats = this.applyRaceBonuses(stats, race);
 
-    // 4.5 Aplicar ASI (Ability Score Improvement)
-    // A cada 4 níveis (4, 8, 12...) ganha +2 em um ou +1 em dois.
-    // Simplificação: Nível 4 aplica ASI focado no atributo principal e secundário.
     if (level >= 4) {
         stats = this.applyASI(stats, characterClass);
     }
 
-    // 5. Calcular Modificadores e Derivados
     const modifiers = this.calculateModifiers(stats);
     const hp = this.calculateHP(characterClass, modifiers.CON, level, race);
     const armorClass = this.calculateAC(modifiers, characterClass, activeFeatures);
     const proficiencyBonus = this.calculateProficiencyBonus(level);
     const initiative = modifiers.DEX;
 
-    // 6. Selecionar Magias (se aplicável)
     const spells = this.selectSpells(characterClass, race, level);
 
-    // 7. Background e Personalidade
     const background = this.getRandomBackground();
     const personality = this.generatePersonality(background.traits, background.ideals, background.bonds, background.flaws);
 
@@ -101,33 +84,22 @@ export class CharacterGeneratorService {
     if (charClass.spellcasting) {
         const slots = charClass.spellcasting.slotsPerLevel[level];
         
-        // Se a classe tem slots neste nível
         if (slots) {
             const classSpells = SPELLS.filter(s => s.classes.includes(charClass.id));
             
-            // Cantrips (Nível 0)
             const cantripsKnownCount = charClass.spellcasting.cantripsKnown?.[level] || 0;
             
             if (cantripsKnownCount > 0) {
                  const cantrips = classSpells.filter(s => s.level === 0);
                  const known = this.pickRandom(cantrips, cantripsKnownCount);
                  spellList.cantrips.push(...known.map(s => s.name));
-            } else if (charClass.spellcasting.knownSpellsPerLevel) {
-                 // Fallback para lógica específica se não tiver cantripsKnown explícito
-                 // Ex: Paladinos não tem cantrips, Magos tem fixo.
-                 // Vamos assumir 3 se não definido e for caster, ou 0.
             }
 
-            // Magias de Círculo 1, 2, 3...
-            // A lógica correta seria "Magias Conhecidas" vs "Magias Preparadas".
-            // Simplificação MVP: Se tem slot de nível X, conhece/prepara X magias desse nível.
-            
             [1, 2, 3].forEach(spellLevel => {
                 const slotCount = slots[spellLevel];
                 if (slotCount && slotCount > 0) {
                     const availableSpells = classSpells.filter(s => s.level === spellLevel);
-                    // Seleciona um número razoável (ex: 2 a 4 magias desse nível)
-                    const countToPick = Math.min(availableSpells.length, 3); // Pega 3 opções
+                    const countToPick = Math.min(availableSpells.length, 3);
                     const picked = this.pickRandom(availableSpells, countToPick);
                     
                     if (spellLevel === 1) spellList.level1.push(...picked.map(s => s.name));
@@ -138,11 +110,9 @@ export class CharacterGeneratorService {
         }
     }
 
-    // Magias Raciais
     if (race.id === 'tiefling') {
         if (!spellList.cantrips.includes('Taumaturgia')) spellList.cantrips.push('Taumaturgia (Racial)');
         if (level >= 3 && !spellList.level1.includes('Repreensão Infernal')) spellList.level1.push('Repreensão Infernal (Racial)');
-        // Lvl 5 Tiefling ganha Darkness, mas não temos Darkness no DB ainda.
     }
     if (race.id === 'elf-high') {
         const wizardCantrips = SPELLS.filter(s => s.classes.includes('wizard') && s.level === 0);
@@ -271,7 +241,6 @@ export class CharacterGeneratorService {
     const hasLeather = charClass.startingEquipment.some(i => i.includes('Couro') || i.includes('Couro Batido'));
     const hasShield = charClass.startingEquipment.some(i => i.includes('Escudo'));
 
-    // Lógica simples de prioridade: Heavy > Medium > Unarmored > Light
     if (hasChainMail) {
         ac = 16; 
         if (hasShield) ac += 2;
@@ -284,26 +253,20 @@ export class CharacterGeneratorService {
         return ac;
     }
 
-    // Unarmored Defense (Monk/Barbarian) - Assume que preferem isso se for melhor que light armor
     if (charClass.id === 'monk') {
          const monkAC = 10 + dexMod + modifiers.WIS;
          if (monkAC > ac) ac = monkAC;
     }
     else if (charClass.id === 'barbarian') {
          const barbAC = 10 + dexMod + modifiers.CON;
-         // Bárbaro pode usar escudo com Unarmored Defense
          const shieldBonus = hasShield ? 2 : 0;
          if ((barbAC + shieldBonus) > ac) ac = barbAC + shieldBonus;
     }
-    // Se não for unarmored ou se light armor for melhor (raro para esses dois, mas possível)
     else if (hasLeather) {
         ac = 11 + dexMod;
         if (hasShield) ac += 2;
     }
-    // Caso base (sem armadura, mago/sorcerer)
     else {
-        // Mago/Sorcerer pode ter Mage Armor (AC 13+dex), mas é spell, não base.
-        // Draconic Sorcerer (Feature)
         const draconicResilience = features.find(f => f.name === 'Resiliência Dracônica');
         if (draconicResilience) {
             ac = 13 + dexMod;

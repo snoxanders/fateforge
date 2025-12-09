@@ -9,7 +9,7 @@ export class DatabaseService {
     const data = {
         name: character.name,
         level: character.level,
-        userId: userId || null, // Associa ao usuário se fornecido
+        userId: userId || null,
         raceId: character.race.id,
         raceName: character.race.name,
         classId: character.class.id,
@@ -39,7 +39,6 @@ export class DatabaseService {
   }
 
   static async getAllCharacters(userId?: string) {
-    // Se não tiver userId, retorna lista vazia (ou pública, se quiséssemos)
     if (!userId) return [];
 
     const records = await prisma.character.findMany({
@@ -77,9 +76,6 @@ export class DatabaseService {
   static async deleteCharacter(id: string, userId?: string) {
     if (!userId) throw new Error("Unauthorized delete");
 
-    // deleteMany é usado aqui para poder passar cláusula 'where' composta (id + userId)
-    // Prisma 'delete' exige apenas @id unique.
-    // Se o registro não existir com esse userId, count será 0.
     return await prisma.character.deleteMany({
         where: { id, userId }
     });

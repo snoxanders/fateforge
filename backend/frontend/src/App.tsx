@@ -80,7 +80,7 @@ function FateForgeApp() {
     if (!user) return;
     try {
         const res = await axios.get(`${API_URL}/api/characters`, {
-            headers: { 'user-id': user.id } // Simplificação: enviar ID no header por enquanto (inseguro, mas funcional pro MVP local)
+            headers: { 'user-id': user.id }
         });
         setSavedCharacters(res.data);
     } catch (error) {
@@ -181,7 +181,6 @@ function FateForgeApp() {
     const doc = new jsPDF();
     doc.setFont("helvetica");
     
-    // Header
     doc.setFontSize(24);
     doc.text(charToExport.name, 20, 20);
     
@@ -194,7 +193,6 @@ function FateForgeApp() {
     doc.text(classLine, 20, 30);
     doc.line(20, 35, 190, 35); 
 
-    // Stats
     doc.setTextColor(0);
     doc.setFontSize(14);
     doc.text(`HP: ${charToExport.hp}`, 20, 50);
@@ -202,7 +200,6 @@ function FateForgeApp() {
     doc.text(`Iniciativa: ${charToExport.initiative >= 0 ? '+' : ''}${charToExport.initiative}`, 100, 50);
     doc.text(`Deslocamento: ${charToExport.race.speed}ft`, 140, 50);
 
-    // Atributos Box
     doc.setFontSize(16);
     doc.text("Atributos", 20, 70);
     doc.setFontSize(10);
@@ -217,11 +214,9 @@ function FateForgeApp() {
         doc.setFontSize(10);
         doc.text(key, x + 12.5, y + 5, { align: 'center' });
         
-        // Modificador GRANDE no centro
         doc.setFontSize(16);
         doc.text(`${mod >= 0 ? '+' : ''}${mod}`, x + 12.5, y + 15, { align: 'center' });
         
-        // Valor pequeno embaixo
         doc.setFontSize(8);
         doc.setTextColor(100);
         doc.text(value.toString(), x + 12.5, y + 22, { align: 'center' });
@@ -230,7 +225,6 @@ function FateForgeApp() {
         x += 30;
     });
 
-    // Proficiências
     y = 120;
     doc.setFontSize(14);
     doc.text("Combate & Proficiências", 20, y);
@@ -238,7 +232,6 @@ function FateForgeApp() {
     doc.text(`• Bônus de Proficiência: +${charToExport.proficiencyBonus}`, 20, y + 10);
     doc.text(`• Dado de Vida: d${charToExport.class.hitDie}`, 20, y + 16);
 
-    // Spells no PDF
     const hasSpells = charToExport.spells && (
         charToExport.spells.cantrips.length > 0 || 
         charToExport.spells.level1.length > 0 ||
@@ -269,23 +262,20 @@ function FateForgeApp() {
             doc.text(`Nível 3: ${charToExport.spells.level3.join(', ')}`, 20, spellY);
             spellY += 6;
         }
-        y = 190; // Empurra o próximo bloco pra baixo
+        y = 190;
     } else {
-        y = 150; // Mantém original se não tiver magias
+        y = 150;
     }
 
-    // Equipamentos no PDF
     if (charToExport.equipment && charToExport.equipment.length > 0) {
         doc.setFontSize(14);
-        doc.text("Equipamento", 120, 120); // Coluna direita
+        doc.text("Equipamento", 120, 120);
         doc.setFontSize(10);
         charToExport.equipment.forEach((item: string, i: number) => {
             doc.text(`• ${item}`, 120, 130 + (i * 6));
         });
     }
 
-    // Background
-    // y foi ajustado acima
     doc.setFontSize(14);
     doc.text(`Antecedente: ${charToExport.background.name}`, 20, y);
     doc.setFontSize(10);
@@ -293,11 +283,9 @@ function FateForgeApp() {
     const splitDesc = doc.splitTextToSize(charToExport.background.description, 170);
     doc.text(splitDesc, 20, y + 10);
     
-    // Calcular altura dinâmica do texto do background para não encavalar
-    const descHeight = splitDesc.length * 5; // aprox 5pts por linha
-    y += 20 + descHeight; // Margem base + altura do texto
+    const descHeight = splitDesc.length * 5;
+    y += 20 + descHeight;
 
-    // Personalidade
     doc.setFontSize(14);
     doc.text("Personalidade", 20, y);
     doc.setFontSize(10);
@@ -306,7 +294,6 @@ function FateForgeApp() {
     doc.text(`Vínculo: ${charToExport.personality.bond}`, 20, y + 30, { maxWidth: 170 });
     doc.text(`Falha: ${charToExport.personality.flaw}`, 20, y + 40, { maxWidth: 170 });
 
-    // Footer
     doc.setFontSize(8);
     doc.setTextColor(150);
     doc.text("Gerado por FateForge", 105, 280, { align: 'center' });
@@ -316,7 +303,6 @@ function FateForgeApp() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 font-sans flex flex-col">
-      {/* Navbar */}
       <nav className="bg-slate-950 border-b border-slate-800 p-4 sticky top-0 z-20">
           <div className="max-w-4xl mx-auto flex justify-between items-center">
             <div className="flex items-center gap-2 text-amber-500 font-bold text-xl">
@@ -346,12 +332,10 @@ function FateForgeApp() {
       <main className="flex-1 p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
             
-            {/* TAB: GENERATOR */}
             {activeTab === 'generator' && (
                 <>
                     <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-8 border border-slate-700">
                         <div className="flex flex-col gap-4">
-                            {/* Top Row: Name + Advanced Toggle */}
                             <div className="flex justify-between items-end gap-2">
                                 <div className="flex-1">
                                     <label className="block text-sm font-medium text-slate-400 mb-1">Nome do Personagem (Opcional)</label>
@@ -372,7 +356,6 @@ function FateForgeApp() {
                                 </button>
                             </div>
 
-                            {/* Advanced Filters (Collapsible) */}
                             {showAdvanced && (
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-900/50 p-4 rounded border border-slate-700 animate-fade-in">
                                     <div>
@@ -411,7 +394,6 @@ function FateForgeApp() {
                                 </div>
                             )}
 
-                            {/* Action Button */}
                             <button
                                 onClick={handleGenerate}
                                 disabled={loading}
@@ -552,7 +534,6 @@ function FateForgeApp() {
                                     </div>
                                 )}
 
-                                {/* Equipamentos */}
                                 {character.equipment && character.equipment.length > 0 && (
                                     <div>
                                         <h3 className="font-bold text-slate-700 border-b border-slate-300 pb-1 mb-2 flex items-center gap-2">
@@ -595,7 +576,6 @@ function FateForgeApp() {
                 </>
             )}
 
-            {/* TAB: LIBRARY */}
             {activeTab === 'library' && (
                 <div>
                     <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
