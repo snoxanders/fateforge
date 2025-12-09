@@ -5,8 +5,9 @@ export interface Class {
   statPriority: ('STR' | 'DEX' | 'CON' | 'INT' | 'WIS' | 'CHA')[]; 
   spellcasting?: {
     ability: 'INT' | 'WIS' | 'CHA';
-    cantripsKnown: number; 
-    spellsKnown: number;   
+    slotsPerLevel: { [level: number]: { [spellLevel: number]: number } };
+    knownSpellsPerLevel?: { [level: number]: number }; // Magias de círculo 1+
+    cantripsKnown?: { [level: number]: number };      // Truques
   };
   proficiencies: {
     armor: string[];
@@ -15,7 +16,15 @@ export interface Class {
     savingThrows: string[];
     skills: ClassSkillChoice;
   };
-  startingEquipment: string[]; // Lista de itens iniciais (simplificado)
+  startingEquipment: string[];
+  features: ClassFeature[];
+  subclasses?: Subclass[]; 
+}
+
+export interface Subclass {
+  id: string;
+  name: string;
+  description: string;
   features: ClassFeature[];
 }
 

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Shield, Sword, Scroll, Dice5, RefreshCw, Download, Save, Trash2, Users, Plus, Sparkles, Settings2, Backpack } from 'lucide-react';
 import { jsPDF } from 'jspdf';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LoginButton } from './components/LoginButton';
 
 interface Character {
   id?: string; 
@@ -9,6 +11,7 @@ interface Character {
   level: number;
   race: { id: string; name: string; speed: number; size: string };
   class: { id: string; name: string; hitDie: number };
+  subclass?: { id: string; name: string; description: string };
   stats: { STR: number; DEX: number; CON: number; INT: number; WIS: number; CHA: number };
   modifiers: { STR: number; DEX: number; CON: number; INT: number; WIS: number; CHA: number };
   hp: number;
@@ -17,19 +20,19 @@ interface Character {
   initiative: number;
   background: { name: string; description: string };
   personality: { trait: string; ideal: string; bond: string; flaw: string };
-  spells?: { cantrips: string[]; level1: string[] };
+  spells?: { cantrips: string[]; level1: string[]; level2?: string[]; level3?: string[] };
   equipment?: string[];
   createdAt?: string;
 }
 
-function App() {
+function FateForgeApp() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'generator' | 'library'>('generator');
   const [name, setName] = useState('');
   const [character, setCharacter] = useState<Character | null>(null);
   const [savedCharacters, setSavedCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(false);
   
-  // Filtros Avançados
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [selectedRace, setSelectedRace] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
@@ -37,7 +40,6 @@ function App() {
 
   const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001' : '');
 
-  // Dados estáticos para dropdowns (Idealmente viria do backend)
   const racesList = [
       { id: 'human', name: 'Humano' },
       { id: 'elf-high', name: 'Alto Elfo' },
@@ -66,29 +68,38 @@ function App() {
       { id: 'druid', name: 'Druida' }
   ];
 
-  // Carregar salvos ao iniciar
   useEffect(() => {
-    const saved = localStorage.getItem('fateforge_library');
-    if (saved) {
-        try {
-            setSavedCharacters(JSON.parse(saved));
-        } catch (e) {
-            console.error("Erro ao carregar biblioteca", e);
-        }
+    if (user) {
+        fetchLibrary();
+    } else {
+        setSavedCharacters([]);
     }
-  }, []);
+  }, [user]);
+
+  const fetchLibrary = async () => {
+    if (!user) return;
+    try {
+        const res = await axios.get(`${API_URL}/api/characters`, {
+            headers: { 'user-id': user.id } // Simplificação: enviar ID no header por enquanto (inseguro, mas funcional pro MVP local)
+        });
+        setSavedCharacters(res.data);
+    } catch (error) {
+        console.error("Erro ao carregar biblioteca", error);
+    }
+  };
 
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/api/generate`, {
+      const payload = {
         name: name || undefined,
         level: selectedLevel,
         method: 'roll',
         raceId: selectedRace || undefined,
         classId: selectedClass || undefined
-      });
-      const newChar = { ...response.data, id: Date.now().toString() };
+      };
+      const response = await axios.post(`${API_URL}/api/generate`, payload);
+      const newChar = { ...response.data }; 
       setCharacter(newChar);
     } catch (error) {
       console.error("Failed to generate character", error);
@@ -106,7 +117,7 @@ function App() {
         character,
         target
       });
-      setCharacter({ ...response.data, id: character.id }); 
+      setCharacter({ ...response.data }); 
     } catch (error) {
       console.error("Failed to reroll", error);
     } finally {
@@ -114,20 +125,33 @@ function App() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
       if (!character) return;
-      
-      const newLibrary = [...savedCharacters, { ...character, createdAt: new Date().toISOString() }];
-      setSavedCharacters(newLibrary);
-      localStorage.setItem('fateforge_library', JSON.stringify(newLibrary));
-      alert("Personagem salvo na biblioteca!");
+      if (!user) {
+          alert("Você precisa estar logado para salvar personagens.");
+          return;
+      }
+      try {
+        await axios.post(`${API_URL}/api/characters`, { ...character, userId: user.id }, {
+            headers: { 'user-id': user.id }
+        });
+        alert("Personagem salvo na biblioteca!");
+        fetchLibrary();
+      } catch (e) {
+        console.error("Erro ao salvar", e);
+        alert("Erro ao salvar personagem.");
+      }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
       if (!confirm("Tem certeza que deseja excluir este personagem?")) return;
-      const newLibrary = savedCharacters.filter(c => c.id !== id);
-      setSavedCharacters(newLibrary);
-      localStorage.setItem('fateforge_library', JSON.stringify(newLibrary));
+      try {
+          await axios.delete(`${API_URL}/api/characters/${id}`);
+          fetchLibrary();
+      } catch (e) {
+          console.error("Erro ao excluir", e);
+          alert("Erro ao excluir personagem.");
+      }
   };
 
   const handleLoad = (char: Character) => {
@@ -136,8 +160,6 @@ function App() {
   };
 
   const getAvatarUrl = (raceName: string) => {
-    // Caminhos absolutos a partir da raiz pública (public folder)
-    // Nota: Certifique-se que os arquivos existem em public/assets/races/
     switch (raceName) {
         case 'Humano': return "/assets/races/human.png";
         case 'Alto Elfo': return "/assets/races/elf.png";
@@ -165,7 +187,11 @@ function App() {
     
     doc.setFontSize(12);
     doc.setTextColor(100);
-    doc.text(`Nível ${charToExport.level} ${charToExport.race.name} ${charToExport.class.name}`, 20, 30);
+    let classLine = `Nível ${charToExport.level} ${charToExport.race.name} ${charToExport.class.name}`;
+    if (charToExport.subclass) {
+        classLine += ` (${charToExport.subclass.name})`;
+    }
+    doc.text(classLine, 20, 30);
     doc.line(20, 35, 190, 35); 
 
     // Stats
@@ -213,7 +239,14 @@ function App() {
     doc.text(`• Dado de Vida: d${charToExport.class.hitDie}`, 20, y + 16);
 
     // Spells no PDF
-    if (charToExport.spells && (charToExport.spells.cantrips.length > 0 || charToExport.spells.level1.length > 0)) {
+    const hasSpells = charToExport.spells && (
+        charToExport.spells.cantrips.length > 0 || 
+        charToExport.spells.level1.length > 0 ||
+        (charToExport.spells.level2 && charToExport.spells.level2.length > 0) ||
+        (charToExport.spells.level3 && charToExport.spells.level3.length > 0)
+    );
+
+    if (hasSpells && charToExport.spells) {
         y = 150;
         doc.setFontSize(14);
         doc.text("Magias Conhecidas", 20, y);
@@ -222,12 +255,21 @@ function App() {
         let spellY = y + 10;
         if (charToExport.spells.cantrips.length > 0) {
             doc.text(`Truques: ${charToExport.spells.cantrips.join(', ')}`, 20, spellY);
-            spellY += 10;
+            spellY += 6;
         }
         if (charToExport.spells.level1.length > 0) {
             doc.text(`Nível 1: ${charToExport.spells.level1.join(', ')}`, 20, spellY);
+            spellY += 6;
         }
-        y = 180; // Empurra o próximo bloco pra baixo
+        if (charToExport.spells.level2 && charToExport.spells.level2.length > 0) {
+            doc.text(`Nível 2: ${charToExport.spells.level2.join(', ')}`, 20, spellY);
+            spellY += 6;
+        }
+        if (charToExport.spells.level3 && charToExport.spells.level3.length > 0) {
+            doc.text(`Nível 3: ${charToExport.spells.level3.join(', ')}`, 20, spellY);
+            spellY += 6;
+        }
+        y = 190; // Empurra o próximo bloco pra baixo
     } else {
         y = 150; // Mantém original se não tiver magias
     }
@@ -280,19 +322,23 @@ function App() {
             <div className="flex items-center gap-2 text-amber-500 font-bold text-xl">
                 <Dice5 /> FateForge
             </div>
-            <div className="flex gap-2">
-                <button 
-                    onClick={() => setActiveTab('generator')}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition flex items-center gap-2 ${activeTab === 'generator' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
-                >
-                    <Plus size={16} /> Gerador
-                </button>
-                <button 
-                    onClick={() => setActiveTab('library')}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition flex items-center gap-2 ${activeTab === 'library' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
-                >
-                    <Users size={16} /> Biblioteca ({savedCharacters.length})
-                </button>
+            <div className="flex items-center gap-4">
+                <div className="flex gap-2">
+                    <button 
+                        onClick={() => setActiveTab('generator')}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition flex items-center gap-2 ${activeTab === 'generator' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+                    >
+                        <Plus size={16} /> Gerador
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('library')}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition flex items-center gap-2 ${activeTab === 'library' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+                    >
+                        <Users size={16} /> Biblioteca ({savedCharacters.length})
+                    </button>
+                </div>
+                <div className="h-6 w-px bg-slate-700"></div>
+                <LoginButton />
             </div>
           </div>
       </nav>
@@ -401,9 +447,10 @@ function App() {
                             </div>
                             <div>
                                 <h2 className="text-3xl font-bold text-slate-800">{character.name}</h2>
-                                <div className="flex items-center gap-2 mt-1">
+                                <div className="flex flex-col gap-1 mt-1">
                                     <p className="text-slate-600 font-medium">
-                                    Level {character.level} {character.race.name} {character.class.name}
+                                    Level {character.level} {character.race.name} {character.class.name} 
+                                    {character.subclass && <span className="text-amber-700 font-bold"> ({character.subclass.name})</span>}
                                     </p>
                                     <div className="flex gap-1">
                                         <button onClick={() => handleReroll('race')} className="text-xs bg-slate-300 hover:bg-slate-400 px-2 py-1 rounded text-slate-700 transition" title="Trocar Raça">🎲 Raça</button>
@@ -470,7 +517,12 @@ function App() {
                                     </ul>
                                 </div>
 
-                                {character.spells && (character.spells.cantrips.length > 0 || character.spells.level1.length > 0) && (
+                                {character.spells && (
+                                    character.spells.cantrips.length > 0 || 
+                                    character.spells.level1.length > 0 ||
+                                    (character.spells.level2 && character.spells.level2.length > 0) ||
+                                    (character.spells.level3 && character.spells.level3.length > 0)
+                                ) && (
                                     <div>
                                         <h3 className="font-bold text-slate-700 border-b border-slate-300 pb-1 mb-2 flex items-center gap-2">
                                             <Sparkles size={16} className="text-purple-600" /> Magias
@@ -484,6 +536,16 @@ function App() {
                                             {character.spells.level1.length > 0 && (
                                                 <div>
                                                     <span className="font-semibold text-purple-700">Nível 1:</span> {character.spells.level1.join(', ')}
+                                                </div>
+                                            )}
+                                            {character.spells.level2 && character.spells.level2.length > 0 && (
+                                                <div>
+                                                    <span className="font-semibold text-purple-700">Nível 2:</span> {character.spells.level2.join(', ')}
+                                                </div>
+                                            )}
+                                            {character.spells.level3 && character.spells.level3.length > 0 && (
+                                                <div>
+                                                    <span className="font-semibold text-purple-700">Nível 3:</span> {character.spells.level3.join(', ')}
                                                 </div>
                                             )}
                                         </div>
@@ -540,7 +602,12 @@ function App() {
                         <Save className="text-amber-500" /> Meus Personagens Salvos
                     </h2>
                     
-                    {savedCharacters.length === 0 ? (
+                    {!user ? (
+                        <div className="bg-slate-800 p-10 rounded-lg text-center border border-slate-700 flex flex-col items-center">
+                            <p className="text-slate-400 mb-4">Você precisa estar logado para acessar sua biblioteca.</p>
+                            <LoginButton />
+                        </div>
+                    ) : savedCharacters.length === 0 ? (
                         <div className="bg-slate-800 p-10 rounded-lg text-center border border-slate-700">
                             <p className="text-slate-400 mb-4">Você ainda não salvou nenhum personagem.</p>
                             <button onClick={() => setActiveTab('generator')} className="text-amber-500 hover:underline">
@@ -562,7 +629,12 @@ function App() {
                                             </div>
                                             <div>
                                                 <h3 className="font-bold text-lg text-white">{char.name}</h3>
-                                                <p className="text-sm text-slate-400">{char.race.name} {char.class.name} • Lvl {char.level}</p>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <p className="text-sm text-slate-400">
+                                                        {char.race.name} {char.class.name} • Lvl {char.level}
+                                                    </p>
+                                                    {char.subclass && <p className="text-xs text-amber-500 font-bold">{char.subclass.name}</p>}
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -595,4 +667,10 @@ function App() {
   );
 }
 
-export default App;
+export default function App() {
+    return (
+        <AuthProvider>
+            <FateForgeApp />
+        </AuthProvider>
+    );
+}

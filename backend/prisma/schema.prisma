@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Character {
+  id        String   @id @default(uuid())
+  userId    String?  // ID do usuário dono da ficha (Supabase UUID)
+  name      String
+  level     Int
+  
+  // IDs de referência
+  raceId    String   
+  raceName  String
+  classId   String   
+  className String
+  subclassId String? 
+  subclassName String?
+  
+  // Dados Numéricos
+  hp              Int
+  armorClass      Int
+  proficiencyBonus Int
+  initiative      Int
+  speed           Int
+
+  // Dados Complexos (JSON String)
+  stats           String 
+  modifiers       String 
+  skills          String 
+  equipment       String 
+  spells          String 
+  
+  background      String 
+  personality     String 
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

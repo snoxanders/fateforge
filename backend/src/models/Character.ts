@@ -1,6 +1,6 @@
 import { Stats, StatModifiers } from './Stats';
 import { Race } from './Race';
-import { Class } from './Class';
+import { Class, Subclass } from './Class';
 
 export interface Character {
   id?: string;
@@ -8,6 +8,7 @@ export interface Character {
   level: number;
   race: Race;
   class: Class;
+  subclass?: Subclass; // Subclasse escolhida (se houver)
   stats: Stats;
   modifiers: StatModifiers;
   hp: number;
@@ -18,8 +19,10 @@ export interface Character {
   skills: string[];
   equipment: string[];
   spells: {
-    cantrips: string[]; // Nomes das magias
+    cantrips: string[];
     level1: string[];
+    level2?: string[];
+    level3?: string[];
   };
   background: CharacterBackground;
   personality: PersonalityTraits;
@@ -42,7 +45,6 @@ export type GenerationMethod = 'roll' | 'standard' | 'point-buy';
 export interface GenerationPreferences {
   level?: number;
   method?: GenerationMethod;
-  classId?: string; // Opcional: forçar classe
-  raceId?: string;  // Opcional: forçar raça
+  classId?: string; 
+  raceId?: string;
 }
-
