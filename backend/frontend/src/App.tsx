@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginButton } from './components/LoginButton';
 import { CharacterSheet, Character } from './components/CharacterSheet';
 import { generatePDF } from './utils/pdfExport';
+import { RPGCard } from './components/ui/RPGCard';
 
 function FateForgeApp() {
   const { user } = useAuth();
@@ -144,93 +145,92 @@ function FateForgeApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans flex flex-col">
-      <nav className="bg-slate-950 border-b border-slate-800 p-4 sticky top-0 z-20">
-          <div className="max-w-4xl mx-auto flex justify-between items-center">
-            <div className="flex items-center gap-2 text-amber-500 font-bold text-xl">
-                <Dice5 /> FateForge
+    <div className="min-h-screen bg-rpg-950 text-stone-200 font-sans flex flex-col selection:bg-amber-900 selection:text-white">
+      <nav className="bg-black/40 border-b border-stone-800 p-4 sticky top-0 z-50 backdrop-blur-md">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <div className="flex items-center gap-2 text-amber-500 font-serif font-bold text-2xl tracking-wide">
+                <Dice5 className="text-amber-600" /> FateForge
             </div>
             <div className="flex items-center gap-4">
                 <div className="flex gap-2">
                     <button 
                         onClick={() => setActiveTab('generator')}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition flex items-center gap-2 ${activeTab === 'generator' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 ${activeTab === 'generator' ? 'bg-amber-700/20 text-amber-500 border border-amber-700/50' : 'text-stone-500 hover:text-stone-300 hover:bg-stone-900/50 border border-transparent'}`}
                     >
                         <Plus size={16} /> Gerador
                     </button>
                     <button 
                         onClick={() => setActiveTab('library')}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition flex items-center gap-2 ${activeTab === 'library' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 ${activeTab === 'library' ? 'bg-amber-700/20 text-amber-500 border border-amber-700/50' : 'text-stone-500 hover:text-stone-300 hover:bg-stone-900/50 border border-transparent'}`}
                     >
                         <Users size={16} /> Biblioteca ({savedCharacters.length})
                     </button>
                 </div>
-                <div className="h-6 w-px bg-slate-700"></div>
+                <div className="h-6 w-px bg-stone-800"></div>
                 <LoginButton />
             </div>
           </div>
       </nav>
 
       <main className="flex-1 p-4 md:p-8">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
             
             {activeTab === 'generator' && (
                 <>
-                    <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-8 border border-slate-700">
-                        <div className="flex flex-col gap-4">
-                            <div className="flex justify-between items-end gap-2">
-                                <div className="flex-1">
-                                    <label className="block text-sm font-medium text-slate-400 mb-1">Nome do Personagem (Opcional)</label>
+                    <RPGCard className="mb-8" title="Configuração da Aventura" icon={<Settings2 size={18} />}>
+                        <div className="flex flex-col gap-6">
+                            <div className="flex flex-col md:flex-row justify-between items-end gap-4">
+                                <div className="flex-1 w-full">
+                                    <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Nome do Personagem (Opcional)</label>
                                     <input
                                         type="text"
                                         placeholder="Ex: Valeros"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        className="w-full bg-slate-900 border border-slate-600 rounded px-4 py-2 text-white focus:ring-2 focus:ring-amber-500 outline-none transition"
+                                        className="w-full bg-stone-950 border border-stone-800 rounded px-4 py-3 text-stone-100 focus:ring-1 focus:ring-amber-600 focus:border-amber-600 outline-none transition placeholder-stone-700"
                                     />
                                 </div>
                                 <button 
                                     onClick={() => setShowAdvanced(!showAdvanced)}
-                                    className={`p-2 rounded transition flex items-center justify-center gap-2 h-[42px] w-[42px] border ${showAdvanced ? 'bg-slate-700 border-amber-500 text-amber-500' : 'bg-slate-900 border-slate-600 text-slate-400 hover:bg-slate-700'}`}
-                                    title="Opções Avançadas"
+                                    className={`p-2 rounded transition flex items-center justify-center gap-2 h-[50px] px-6 border ${showAdvanced ? 'bg-stone-800 border-amber-600 text-amber-500' : 'bg-stone-900 border-stone-700 text-stone-400 hover:bg-stone-800 hover:border-stone-500'}`}
                                 >
-                                    <Settings2 size={20} />
+                                    <Settings2 size={18} /> {showAdvanced ? 'Menos Opções' : 'Mais Opções'}
                                 </button>
                             </div>
 
                             {showAdvanced && (
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-900/50 p-4 rounded border border-slate-700 animate-fade-in">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-stone-950/30 p-6 rounded border border-stone-800/50 animate-fade-in">
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Raça</label>
+                                        <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Raça</label>
                                         <select 
                                             value={selectedRace}
                                             onChange={(e) => setSelectedRace(e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white focus:ring-1 focus:ring-amber-500 outline-none"
+                                            className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-stone-200 focus:ring-1 focus:ring-amber-600 outline-none"
                                         >
                                             <option value="">Aleatória</option>
                                             {racesList.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Classe</label>
+                                        <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Classe</label>
                                         <select 
                                             value={selectedClass}
                                             onChange={(e) => setSelectedClass(e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white focus:ring-1 focus:ring-amber-500 outline-none"
+                                            className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-stone-200 focus:ring-1 focus:ring-amber-600 outline-none"
                                         >
                                             <option value="">Aleatória</option>
                                             {classesList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nível ({selectedLevel})</label>
+                                        <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Nível ({selectedLevel})</label>
                                         <input 
                                             type="range" 
                                             min="1" 
                                             max="5" 
                                             value={selectedLevel}
                                             onChange={(e) => setSelectedLevel(parseInt(e.target.value))}
-                                            className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500 mt-3"
+                                            className="w-full h-2 bg-stone-800 rounded-lg appearance-none cursor-pointer accent-amber-600 mt-3"
                                         />
                                     </div>
                                 </div>
@@ -239,18 +239,18 @@ function FateForgeApp() {
                             <button
                                 onClick={handleGenerate}
                                 disabled={loading}
-                                className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-slate-600 text-white font-bold py-3 px-8 rounded transition flex items-center justify-center gap-2 shadow-lg hover:shadow-amber-900/20"
+                                className="w-full bg-amber-700 hover:bg-amber-600 disabled:bg-stone-800 text-stone-100 font-bold font-serif uppercase tracking-widest py-4 px-8 rounded transition flex items-center justify-center gap-3 shadow-lg hover:shadow-amber-900/30 border border-transparent hover:border-amber-400"
                             >
-                                {loading ? <RefreshCw className="animate-spin" /> : 'Gerar Personagem'}
+                                {loading ? <RefreshCw className="animate-spin" /> : 'Invocar Personagem'}
                             </button>
                         </div>
-                    </div>
+                    </RPGCard>
 
                     {character ? (
-                        <div className="mb-10 relative">
+                        <div className="mb-10 relative animate-fade-in">
                             {loading && (
-                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-10 rounded-lg backdrop-blur-sm">
-                                    <RefreshCw className="animate-spin text-white w-12 h-12" />
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10 rounded-lg backdrop-blur-sm">
+                                    <RefreshCw className="animate-spin text-amber-500 w-12 h-12" />
                                 </div>
                             )}
                             <CharacterSheet 
@@ -261,10 +261,10 @@ function FateForgeApp() {
                             />
                         </div>
                     ) : (
-                        <div className="text-center py-20 opacity-50 bg-slate-800/50 rounded-lg border border-slate-800">
-                            <Dice5 size={64} className="mx-auto mb-4 text-slate-600" />
-                            <h2 className="text-2xl font-bold text-slate-500">Sua aventura começa aqui</h2>
-                            <p className="text-slate-400">Clique em "Gerar Personagem" para criar sua primeira ficha completa.</p>
+                        <div className="text-center py-24 opacity-60 rounded-lg border-2 border-dashed border-stone-800 hover:border-stone-700 transition-colors">
+                            <Dice5 size={64} className="mx-auto mb-4 text-stone-700" />
+                            <h2 className="text-3xl font-serif font-bold text-stone-600 mb-2">Sua Lenda Aguarda</h2>
+                            <p className="text-stone-500">Configure os parâmetros acima e invoque seu herói.</p>
                         </div>
                     )}
                 </>
@@ -272,29 +272,29 @@ function FateForgeApp() {
 
             {activeTab === 'library' && (
                 <div>
-                    <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                        <Save className="text-amber-500" /> Meus Personagens Salvos
+                    <h2 className="text-2xl font-serif font-bold text-stone-200 mb-6 flex items-center gap-2">
+                        <Save className="text-amber-600" /> Grimório de Heróis
                     </h2>
                     
                     {!user ? (
-                        <div className="bg-slate-800 p-10 rounded-lg text-center border border-slate-700 flex flex-col items-center">
-                            <p className="text-slate-400 mb-4">Você precisa estar logado para acessar sua biblioteca.</p>
+                        <RPGCard className="text-center py-12">
+                            <p className="text-stone-400 mb-4">Você precisa estar logado para acessar seu grimório.</p>
                             <LoginButton />
-                        </div>
+                        </RPGCard>
                     ) : savedCharacters.length === 0 ? (
-                        <div className="bg-slate-800 p-10 rounded-lg text-center border border-slate-700">
-                            <p className="text-slate-400 mb-4">Você ainda não salvou nenhum personagem.</p>
-                            <button onClick={() => setActiveTab('generator')} className="text-amber-500 hover:underline">
-                                Voltar para o Gerador
+                        <RPGCard className="text-center py-12">
+                            <p className="text-stone-400 mb-4">Seu grimório está vazio.</p>
+                            <button onClick={() => setActiveTab('generator')} className="text-amber-500 hover:text-amber-400 hover:underline font-bold">
+                                Criar Novo Herói
                             </button>
-                        </div>
+                        </RPGCard>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {savedCharacters.map((char) => (
-                                <div key={char.id} className="bg-slate-800 p-4 rounded border border-slate-700 hover:border-slate-500 transition group">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="flex gap-3 items-center">
-                                            <div className="w-12 h-12 rounded-lg bg-slate-900 border border-slate-600 overflow-hidden flex-shrink-0">
+                                <RPGCard key={char.id} className="group cursor-pointer hover:border-amber-600/60 transition-all duration-300">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex gap-4 items-center">
+                                            <div className="w-16 h-16 rounded-lg bg-stone-950 border border-stone-700 overflow-hidden flex-shrink-0 shadow-md">
                                                 <img 
                                                     src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${char.race.name}-${char.name}`} 
                                                     alt="Avatar" 
@@ -302,31 +302,29 @@ function FateForgeApp() {
                                                 />
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-lg text-white">{char.name}</h3>
+                                                <h3 className="font-serif font-bold text-xl text-stone-200 group-hover:text-amber-500 transition-colors">{char.name}</h3>
                                                 <div className="flex flex-col gap-0.5">
-                                                    <p className="text-sm text-slate-400">
-                                                        {char.race.name} {char.class.name} • Lvl {char.level}
+                                                    <p className="text-xs text-stone-400 uppercase tracking-wide font-bold">
+                                                        {char.race.name} {char.class.name}
                                                     </p>
-                                                    {char.subclass && <p className="text-xs text-amber-500 font-bold">{char.subclass.name}</p>}
+                                                    <p className="text-xs text-amber-700/80 font-bold">Nível {char.level}</p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onClick={() => handleLoad(char)} className="p-2 bg-indigo-600 text-white rounded hover:bg-indigo-700" title="Abrir na Ficha">
-                                                <Sword size={16} />
-                                            </button>
-                                            <button onClick={() => handleExportPDF(char)} className="p-2 bg-slate-600 text-white rounded hover:bg-slate-700" title="PDF">
-                                                <Download size={16} />
-                                            </button>
-                                            <button onClick={() => handleDelete(char.id!)} className="p-2 bg-red-600 text-white rounded hover:bg-red-700" title="Excluir">
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
                                     </div>
-                                    <div className="flex gap-2 text-xs text-slate-500 mt-4 pt-2 border-t border-slate-700">
-                                        <span>HP: {(char.hp as any)?.max || char.hp}</span>
+                                    
+                                    <div className="flex gap-2 mt-4 pt-4 border-t border-stone-800/50 justify-end">
+                                        <button onClick={() => handleLoad(char)} className="p-2 text-stone-400 hover:text-amber-500 hover:bg-stone-800 rounded transition" title="Abrir">
+                                            <Sword size={18} />
+                                        </button>
+                                        <button onClick={() => handleExportPDF(char)} className="p-2 text-stone-400 hover:text-stone-200 hover:bg-stone-800 rounded transition" title="PDF">
+                                            <Download size={18} />
+                                        </button>
+                                        <button onClick={() => handleDelete(char.id!)} className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-950/30 rounded transition" title="Excluir">
+                                            <Trash2 size={18} />
+                                        </button>
                                     </div>
-                                </div>
+                                </RPGCard>
                             ))}
                         </div>
                     )}
