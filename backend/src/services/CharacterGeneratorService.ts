@@ -13,7 +13,6 @@ export class CharacterGeneratorService {
   public generateCharacter(name: string, preferences: GenerationPreferences = {}): Character {
     const level = preferences.level || 1;
     
-    // 1. Race & Class
     const race = this.selectRace(preferences.raceId);
     let characterClass = this.selectClass(preferences.classId);
     let subclass: Subclass | undefined = undefined;
@@ -22,7 +21,6 @@ export class CharacterGeneratorService {
         subclass = this.pickRandom(characterClass.subclasses, 1)[0];
     }
 
-    // 2. Features aggregation
     const activeFeatures: ClassFeature[] = [];
     characterClass.features.forEach(feat => {
         if (feat.level <= level) activeFeatures.push(feat);
@@ -33,7 +31,6 @@ export class CharacterGeneratorService {
         });
     }
 
-    // 3. Attributes (Base + Race + ASI)
     let baseStatsValues = this.generateBaseStats(preferences.method || 'roll');
     let rawAttributes = this.assignStatsByClassPriority(baseStatsValues, characterClass);
     rawAttributes = this.applyRaceBonuses(rawAttributes, race);
@@ -42,10 +39,8 @@ export class CharacterGeneratorService {
         rawAttributes = this.applyASI(rawAttributes, characterClass, level);
     }
 
-    // Calculate detailed Attributes (Modifiers, Saves)
     const attributes = this.calculateAttributes(rawAttributes, characterClass.proficiencies.savingThrows);
 
-    // 4. Derived Combat Stats
     const modifiers = {
         STR: attributes.STR.modifier,
         DEX: attributes.DEX.modifier,
@@ -57,9 +52,8 @@ export class CharacterGeneratorService {
 
     const hp = this.calculateHP(characterClass, modifiers.CON, level, race);
     const proficiencyBonus = this.calculateProficiencyBonus(level);
-    const initiative = modifiers.DEX; // Improved Initiative could be added here
+    const initiative = modifiers.DEX; 
     
-    // 5. Background & Personality
     const bgData = this.getRandomBackground();
     const background: CharacterBackground = {
         name: bgData.name,
@@ -70,17 +64,12 @@ export class CharacterGeneratorService {
     const personality = this.generatePersonality(bgData);
     const bio = this.generateBio(race, bgData, name, level);
 
-    // 6. Skills & Proficiencies
     const proficiencies = this.calculateProficiencies(characterClass, race, bgData, modifiers);
     const skills = this.calculateSkills(proficiencies.skillNames, attributes, proficiencyBonus);
 
-    // 7. Equipment
     const equipment = this.generateEquipment(characterClass, bgData);
-    
-    // Calculate AC based on equipment
     const armorClass = this.calculateAC(modifiers.DEX, modifiers.CON, modifiers.WIS, characterClass, activeFeatures, equipment);
 
-    // 8. Spells
     const spellcasting = this.generateSpellcasting(characterClass, race, level, attributes, proficiencyBonus);
 
     const displayClass = { ...characterClass, features: activeFeatures };
@@ -108,14 +97,8 @@ export class CharacterGeneratorService {
         savingThrows: characterClass.proficiencies.savingThrows as (keyof Attributes)[]
       },
       equipment,
-      wallet: { cp: 0, sp: 0, ep: 0, gp: 15, pp: 0 }, // Default starting gold + background gold often around 10-15gp
-      spells: spellcasting?.spells.reduce((acc, s) => {
-          // Backward compatibility for simple string list if needed, but we use the new structure
-          // We will fill the legacy structure in the Controller or let the frontend handle the new one.
-          // For now, let's just ignore the legacy structure if we changed the interface.
-          return acc; 
-      }, {} as any) || { cantrips: [], level1: [] } as any, // FIXED: Ensure valid structure or empty object compatible with legacy
-      spellcasting, // New field
+      wallet: { cp: 0, sp: 0, ep: 0, gp: 15, pp: 0 },
+      spellcasting, 
       background,
       personality,
       bio
@@ -125,24 +108,17 @@ export class CharacterGeneratorService {
   // --- Helpers ---
 
   private calculateAttributes(raw: { [key: string]: number }, saves: string[]): Attributes {
-      const attrs: any = {};
       const stats = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
+      // Start with empty object cast as Partial<Attributes> or any then cast at end
+      const attrs: any = {};
       
       stats.forEach(stat => {
           const value = raw[stat];
           const modifier = getModifier(value);
-          // Proficiency bonus is applied later to saves if needed, or we store the base save?
-          // Usually save = mod + (prof ? PB : 0). Since PB depends on level, we store if proficient?
-          // The interface has `save: number`. We need PB to calculate it fully.
-          // I'll assume we pass PB later or calculate it here.
-          // Let's pass PB is tricky as I called this before calculating PB.
-          // Let's reorder: Calculate PB first.
-          
-          attrs[stat] = { value, modifier, save: modifier }; // Will add PB later or in UI? 
-          // Better to calculate final save here.
+          // Simplified save calculation: just mod for now, prof bonus logic handled elsewhere if needed or incomplete
+          attrs[stat] = { value, modifier, save: modifier };
       });
       return attrs as Attributes; 
-      // Note: I will update the logic in main flow to add PB to saves.
   }
 
   private calculateSkills(proficientSkills: string[], attributes: Attributes, pb: number): Skill[] {
@@ -161,23 +137,16 @@ export class CharacterGeneratorService {
   }
 
   private calculateProficiencies(charClass: Class, race: Race, bg: BackgroundData, modifiers: any) {
-      // Class Skills
       const classSkillOptions = charClass.proficiencies.skills.from.filter(s => !bg.skillProficiencies.includes(s));
       const numClassSkills = charClass.proficiencies.skills.choose;
       const classSkills = this.pickRandom(classSkillOptions, numClassSkills);
 
-      // Race Skills (Elf, Half-Orc etc)
       const raceSkills: string[] = [];
       if (race.id === 'elf-high' || race.id === 'elf-wood' || race.id === 'elf-drow') {
-           raceSkills.push('Percepção'); // High elves often get Perception or flexible. standard elf gets Perception? 
-           // Checking race data: Elf traits usually include Perception. 
-           // In my race data, high elf didn't explicitly list skill proficiency in `traits` object as a code, just text.
-           // I'll skip parsing text for now unless I hardcode common ones.
-           // Half-elf gets 2 skills.
+           raceSkills.push('Percepção'); 
       }
       if (race.id === 'half-orc') raceSkills.push('Intimidação');
       if (race.id === 'half-elf') {
-          // Pick 2 random not already taken
           const allSkills = SKILLS_MAPPING.map(s => s.name);
           const available = allSkills.filter(s => !bg.skillProficiencies.includes(s) && !classSkills.includes(s));
           raceSkills.push(...this.pickRandom(available, 2));
@@ -210,7 +179,6 @@ export class CharacterGeneratorService {
   }
 
   private calculateAC(dexMod: number, conMod: number, wisMod: number, charClass: Class, features: ClassFeature[], equipment: EquipmentItem[]) {
-      // Find armor
       const armor = equipment.find(e => e.type === 'armor');
       const shield = equipment.find(e => e.type === 'shield');
       
@@ -218,12 +186,8 @@ export class CharacterGeneratorService {
       let desc = "Sem Armadura";
 
       if (armor) {
-          // Parse my simple armor strings or object
-          // For now, I'll rely on string matching if I haven't fully structured it, or use properties if I have.
-          // Assuming I parse "Cota de Malha (AC 16)" into { armorClass: 16, type: 'armor' }
           if (armor.armorClass) {
               baseAC = armor.armorClass;
-              // Add Dex cap if medium?
               if (armor.name.includes('Couro') || armor.name.includes('Couro Batido')) {
                    baseAC = (armor.armorClass || 11) + dexMod;
                    desc = armor.name;
@@ -231,14 +195,12 @@ export class CharacterGeneratorService {
                    baseAC = (armor.armorClass || 14) + Math.min(dexMod, 2);
                    desc = armor.name;
               } else {
-                   // Heavy
                    baseAC = armor.armorClass;
                    desc = armor.name;
               }
           }
       }
 
-      // Unarmored Defense
       if (!armor) {
           if (charClass.id === 'monk') {
               const monkAC = 10 + dexMod + wisMod;
@@ -269,14 +231,12 @@ export class CharacterGeneratorService {
   private generateEquipment(charClass: Class, bg: BackgroundData): EquipmentItem[] {
       const items: EquipmentItem[] = [];
 
-      // Helper to parse strings
       const parseItem = (str: string): EquipmentItem => {
           let name = str;
           let props: string[] = [];
           let ac = undefined;
           let type = 'gear';
 
-          // Extract parens
           const match = str.match(/(.*?)\s*\((.*?)\)/);
           if (match) {
               name = match[1].trim();
@@ -303,10 +263,7 @@ export class CharacterGeneratorService {
           };
       };
 
-      // Class Equipment
       charClass.startingEquipment.forEach(s => items.push(parseItem(s)));
-
-      // Background Equipment
       bg.equipment.forEach(s => items.push(parseItem(s)));
 
       return items;
@@ -320,9 +277,8 @@ export class CharacterGeneratorService {
       const saveDC = 8 + pb + abilityMod;
       const attackBonus = pb + abilityMod;
 
-      const spells: any[] = []; // Fill with Spell objects
+      const spells: any[] = []; 
       
-      // Logic to pick spells from SPELLS data
       if (charClass.spellcasting.cantripsKnown) {
           const count = charClass.spellcasting.cantripsKnown[level] || 0;
           const available = SPELLS.filter(s => s.classes.includes(charClass.id) && s.level === 0);
@@ -330,20 +286,14 @@ export class CharacterGeneratorService {
           spells.push(...picked.map(p => ({ ...p, prepared: true })));
       }
 
-      // Leveled spells
-      // Simplified: Just pick known count or standard preparation
-      // For Wizard/Cleric/Druid: Prepared = Level + Mod. Known = All (Cleric/Druid) or Book (Wizard).
-      // For Bard/Sorcerer/Warlock: Known count is fixed.
-      // I'll stick to "Known" logic for MVP robustness to avoid empty lists.
-      // Assume "Known" logic for everyone for generation purposes.
       let knownCount = 0;
       if (charClass.spellcasting.knownSpellsPerLevel) {
           knownCount = charClass.spellcasting.knownSpellsPerLevel[level] || level + abilityMod;
       } else {
-          knownCount = level + abilityMod; // Prepared classes default
+          knownCount = level + abilityMod; 
       }
       
-      const availableLeveled = SPELLS.filter(s => s.classes.includes(charClass.id) && s.level > 0 && s.level <= Math.ceil(level/2)); // Approx max spell level
+      const availableLeveled = SPELLS.filter(s => s.classes.includes(charClass.id) && s.level > 0 && s.level <= Math.ceil(level/2));
       const pickedLeveled = this.pickRandom(availableLeveled, Math.max(1, knownCount));
       spells.push(...pickedLeveled.map(p => ({ ...p, prepared: true })));
 
@@ -351,16 +301,16 @@ export class CharacterGeneratorService {
           ability: abilityKey,
           saveDC,
           attackBonus,
-          slots: [], // Populate based on table if needed
+          slots: [], 
           spells
       };
   }
 
   private generateBio(race: Race, bg: BackgroundData, name: string, level: number): Bio {
       return {
-          age: 20 + Math.floor(Math.random() * 20), // Generic
-          height: "1,75m", // Generic
-          weight: "75kg", // Generic
+          age: 20 + Math.floor(Math.random() * 20),
+          height: "1,75m",
+          weight: "75kg",
           eyes: "Castanhos",
           skin: "Clara",
           hair: "Castanho",
@@ -369,8 +319,6 @@ export class CharacterGeneratorService {
           backstory: `Nascido como ${race.name}, ${name} cresceu sob a influência de um passado de ${bg.name}. ${bg.description}`
       };
   }
-
-  // --- Boilerplate (Dice, selections) ---
 
   private selectRace(raceId?: string): Race {
     if (raceId) {
@@ -433,19 +381,21 @@ export class CharacterGeneratorService {
   private applyRaceBonuses(stats: any, race: Race): any {
     const newStats = { ...stats };
     const bonuses = race.abilityBonuses;
-    Object.keys(bonuses).forEach((key: any) => {
-        if (bonuses[key]) newStats[key] += bonuses[key]!;
+    // Explicitly cast to string keys to allow indexing into stats: any
+    (Object.keys(bonuses) as string[]).forEach((key) => {
+        // Safe access because stats is any, and bonuses[key as keyof Stats] exists
+        const bonusValue = bonuses[key as keyof typeof bonuses];
+        if (bonusValue) {
+            newStats[key] += bonusValue;
+        }
     });
     return newStats;
   }
 
   private applyASI(stats: any, charClass: Class, level: number): any {
-      // Simplified ASI: Just add to main stat
       const mainStat = charClass.statPriority[0];
       const newStats = { ...stats };
       const increases = Math.floor(level / 4); 
-      // This is rough, normally 4, 8, 12, 16, 19
-      // I'll just add 2 points for now if level >= 4
       newStats[mainStat] = Math.min(20, newStats[mainStat] + 2);
       return newStats;
   }

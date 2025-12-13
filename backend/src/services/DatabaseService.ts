@@ -28,7 +28,7 @@ export class DatabaseService {
         proficiencies: JSON.stringify(character.proficiencies),
         equipment: JSON.stringify(character.equipment),
         wallet: JSON.stringify(character.wallet),
-        spells: JSON.stringify(character.spells || {}),
+        spells: JSON.stringify(character.spellcasting || {}), // Corrected to use spellcasting
         
         background: JSON.stringify(character.background),
         personality: JSON.stringify(character.personality),
@@ -68,7 +68,7 @@ export class DatabaseService {
         proficiencies: JSON.parse(record.proficiencies),
         equipment: JSON.parse(record.equipment),
         wallet: JSON.parse(record.wallet),
-        spells: JSON.parse(record.spells),
+        spellcasting: JSON.parse(record.spells), // Map database 'spells' field to interface 'spellcasting'
         
         background: JSON.parse(record.background),
         personality: JSON.parse(record.personality),
