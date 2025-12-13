@@ -12,6 +12,7 @@ model Character {
   userId    String?  
   name      String
   level     Int
+  experience Int      @default(0)
   
   raceId    String   
   raceName  String
@@ -20,20 +21,23 @@ model Character {
   subclassId String? 
   subclassName String?
   
-  hp              Int
-  armorClass      Int
+  hp              String // JSON { max, current, temp, hitDice, etc }
+  armorClass      String // JSON { value, description }
   proficiencyBonus Int
   initiative      Int
   speed           Int
+  passivePerception Int @default(10)
 
-  stats           String 
-  modifiers       String 
-  skills          String 
-  equipment       String 
-  spells          String 
+  attributes      String // JSON { STR, DEX... }
+  skills          String // JSON
+  proficiencies   String // JSON
+  equipment       String // JSON
+  wallet          String // JSON
+  spells          String // JSON
   
-  background      String 
-  personality     String 
+  background      String // JSON
+  personality     String // JSON
+  bio             String // JSON
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,29 +1,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Shield, Sword, Scroll, Dice5, RefreshCw, Download, Save, Trash2, Users, Plus, Sparkles, Settings2, Backpack } from 'lucide-react';
-import { jsPDF } from 'jspdf';
+import { Dice5, RefreshCw, Users, Plus, Settings2, Save, Sword, Download, Trash2 } from 'lucide-react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginButton } from './components/LoginButton';
-
-interface Character {
-  id?: string; 
-  name: string;
-  level: number;
-  race: { id: string; name: string; speed: number; size: string };
-  class: { id: string; name: string; hitDie: number };
-  subclass?: { id: string; name: string; description: string };
-  stats: { STR: number; DEX: number; CON: number; INT: number; WIS: number; CHA: number };
-  modifiers: { STR: number; DEX: number; CON: number; INT: number; WIS: number; CHA: number };
-  hp: number;
-  armorClass: number;
-  proficiencyBonus: number;
-  initiative: number;
-  background: { name: string; description: string };
-  personality: { trait: string; ideal: string; bond: string; flaw: string };
-  spells?: { cantrips: string[]; level1: string[]; level2?: string[]; level3?: string[] };
-  equipment?: string[];
-  createdAt?: string;
-}
+import { CharacterSheet, Character } from './components/CharacterSheet';
+import { generatePDF } from './utils/pdfExport';
 
 function FateForgeApp() {
   const { user } = useAuth();
@@ -99,8 +80,7 @@ function FateForgeApp() {
         classId: selectedClass || undefined
       };
       const response = await axios.post(`${API_URL}/api/generate`, payload);
-      const newChar = { ...response.data }; 
-      setCharacter(newChar);
+      setCharacter(response.data);
     } catch (error) {
       console.error("Failed to generate character", error);
       alert("Erro ao gerar personagem. Verifique se o backend está rodando.");
@@ -117,7 +97,7 @@ function FateForgeApp() {
         character,
         target
       });
-      setCharacter({ ...response.data }); 
+      setCharacter(response.data); 
     } catch (error) {
       console.error("Failed to reroll", error);
     } finally {
@@ -159,146 +139,8 @@ function FateForgeApp() {
       setActiveTab('generator');
   };
 
-  const getAvatarUrl = (raceName: string) => {
-    switch (raceName) {
-        case 'Humano': return "/assets/races/human.png";
-        case 'Alto Elfo': return "/assets/races/elf.png";
-        case 'Anão da Colina': return "/assets/races/dwarf.png";
-        case 'Halfling Pés-Leves': return "/assets/races/halfling.png";
-        case 'Meio-Orc': return "/assets/races/orc.png";
-        case 'Tiefling': return "/assets/races/tiefling.png";
-        case 'Anão da Montanha': return "/assets/races/dwarf.png";
-        case 'Gnomo das Rochas': return "/assets/races/gnome.png";
-        case 'Meio-Elfo': return "/assets/races/half-elf.png";
-        case 'Draconato': return "/assets/races/dragonborn.png";
-        default: return "/assets/races/human.png";
-    }
-  };
-
-  const handleExportPDF = (charToExport: Character = character!) => {
-    if (!charToExport) return;
-
-    const doc = new jsPDF();
-    doc.setFont("helvetica");
-    
-    doc.setFontSize(24);
-    doc.text(charToExport.name, 20, 20);
-    
-    doc.setFontSize(12);
-    doc.setTextColor(100);
-    let classLine = `Nível ${charToExport.level} ${charToExport.race.name} ${charToExport.class.name}`;
-    if (charToExport.subclass) {
-        classLine += ` (${charToExport.subclass.name})`;
-    }
-    doc.text(classLine, 20, 30);
-    doc.line(20, 35, 190, 35); 
-
-    doc.setTextColor(0);
-    doc.setFontSize(14);
-    doc.text(`HP: ${charToExport.hp}`, 20, 50);
-    doc.text(`CA: ${charToExport.armorClass}`, 60, 50);
-    doc.text(`Iniciativa: ${charToExport.initiative >= 0 ? '+' : ''}${charToExport.initiative}`, 100, 50);
-    doc.text(`Deslocamento: ${charToExport.race.speed}ft`, 140, 50);
-
-    doc.setFontSize(16);
-    doc.text("Atributos", 20, 70);
-    doc.setFontSize(10);
-    
-    let x = 20;
-    let y = 80;
-    const stats = Object.entries(charToExport.stats);
-    
-    stats.forEach(([key, value]) => {
-        const mod = charToExport.modifiers[key as keyof typeof charToExport.modifiers];
-        doc.rect(x, y, 25, 25);
-        doc.setFontSize(10);
-        doc.text(key, x + 12.5, y + 5, { align: 'center' });
-        
-        doc.setFontSize(16);
-        doc.text(`${mod >= 0 ? '+' : ''}${mod}`, x + 12.5, y + 15, { align: 'center' });
-        
-        doc.setFontSize(8);
-        doc.setTextColor(100);
-        doc.text(value.toString(), x + 12.5, y + 22, { align: 'center' });
-        doc.setTextColor(0);
-        
-        x += 30;
-    });
-
-    y = 120;
-    doc.setFontSize(14);
-    doc.text("Combate & Proficiências", 20, y);
-    doc.setFontSize(10);
-    doc.text(`• Bônus de Proficiência: +${charToExport.proficiencyBonus}`, 20, y + 10);
-    doc.text(`• Dado de Vida: d${charToExport.class.hitDie}`, 20, y + 16);
-
-    const hasSpells = charToExport.spells && (
-        charToExport.spells.cantrips.length > 0 || 
-        charToExport.spells.level1.length > 0 ||
-        (charToExport.spells.level2 && charToExport.spells.level2.length > 0) ||
-        (charToExport.spells.level3 && charToExport.spells.level3.length > 0)
-    );
-
-    if (hasSpells && charToExport.spells) {
-        y = 150;
-        doc.setFontSize(14);
-        doc.text("Magias Conhecidas", 20, y);
-        doc.setFontSize(10);
-        
-        let spellY = y + 10;
-        if (charToExport.spells.cantrips.length > 0) {
-            doc.text(`Truques: ${charToExport.spells.cantrips.join(', ')}`, 20, spellY);
-            spellY += 6;
-        }
-        if (charToExport.spells.level1.length > 0) {
-            doc.text(`Nível 1: ${charToExport.spells.level1.join(', ')}`, 20, spellY);
-            spellY += 6;
-        }
-        if (charToExport.spells.level2 && charToExport.spells.level2.length > 0) {
-            doc.text(`Nível 2: ${charToExport.spells.level2.join(', ')}`, 20, spellY);
-            spellY += 6;
-        }
-        if (charToExport.spells.level3 && charToExport.spells.level3.length > 0) {
-            doc.text(`Nível 3: ${charToExport.spells.level3.join(', ')}`, 20, spellY);
-            spellY += 6;
-        }
-        y = 190;
-    } else {
-        y = 150;
-    }
-
-    if (charToExport.equipment && charToExport.equipment.length > 0) {
-        doc.setFontSize(14);
-        doc.text("Equipamento", 120, 120);
-        doc.setFontSize(10);
-        charToExport.equipment.forEach((item: string, i: number) => {
-            doc.text(`• ${item}`, 120, 130 + (i * 6));
-        });
-    }
-
-    doc.setFontSize(14);
-    doc.text(`Antecedente: ${charToExport.background.name}`, 20, y);
-    doc.setFontSize(10);
-    
-    const splitDesc = doc.splitTextToSize(charToExport.background.description, 170);
-    doc.text(splitDesc, 20, y + 10);
-    
-    const descHeight = splitDesc.length * 5;
-    y += 20 + descHeight;
-
-    doc.setFontSize(14);
-    doc.text("Personalidade", 20, y);
-    doc.setFontSize(10);
-    doc.text(`Traço: ${charToExport.personality.trait}`, 20, y + 10, { maxWidth: 170 });
-    doc.text(`Ideal: ${charToExport.personality.ideal}`, 20, y + 20, { maxWidth: 170 });
-    doc.text(`Vínculo: ${charToExport.personality.bond}`, 20, y + 30, { maxWidth: 170 });
-    doc.text(`Falha: ${charToExport.personality.flaw}`, 20, y + 40, { maxWidth: 170 });
-
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.text("Gerado por FateForge", 105, 280, { align: 'center' });
-
-    doc.save(`${charToExport.name.replace(/\s+/g, '_')}_FateForge.pdf`);
+  const handleExportPDF = (char: Character = character!) => {
+     if (char) generatePDF(char);
   };
 
   return (
@@ -330,7 +172,7 @@ function FateForgeApp() {
       </nav>
 
       <main className="flex-1 p-4 md:p-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
             
             {activeTab === 'generator' && (
                 <>
@@ -405,172 +247,24 @@ function FateForgeApp() {
                     </div>
 
                     {character ? (
-                    <div className="bg-slate-100 text-slate-900 rounded-lg shadow-2xl overflow-hidden animate-fade-in relative mb-10">
-                        {loading && (
-                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-10">
-                                <RefreshCw className="animate-spin text-white w-12 h-12" />
-                            </div>
-                        )}
-
-                        <div className="bg-slate-200 p-6 border-b border-slate-300 flex flex-wrap justify-between items-center gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-24 h-24 bg-slate-800 rounded-lg overflow-hidden border-2 border-amber-600 shadow-lg flex-shrink-0">
-                                <img 
-                                    src={getAvatarUrl(character.race.name)} 
-                                    alt={character.race.name}
-                                    className="w-full h-full object-cover object-top transform scale-110"
-                                    onError={(e) => {
-                                        console.error(`Erro ao carregar imagem: ${e.currentTarget.src}`);
-                                        // Tenta carregar do DiceBear apenas se a local falhar
-                                        const seed = `${character.race.name}-${character.name}`;
-                                        e.currentTarget.src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`;
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <h2 className="text-3xl font-bold text-slate-800">{character.name}</h2>
-                                <div className="flex flex-col gap-1 mt-1">
-                                    <p className="text-slate-600 font-medium">
-                                    Level {character.level} {character.race.name} {character.class.name} 
-                                    {character.subclass && <span className="text-amber-700 font-bold"> ({character.subclass.name})</span>}
-                                    </p>
-                                    <div className="flex gap-1">
-                                        <button onClick={() => handleReroll('race')} className="text-xs bg-slate-300 hover:bg-slate-400 px-2 py-1 rounded text-slate-700 transition" title="Trocar Raça">🎲 Raça</button>
-                                        <button onClick={() => handleReroll('class')} className="text-xs bg-slate-300 hover:bg-slate-400 px-2 py-1 rounded text-slate-700 transition" title="Trocar Classe">🎲 Classe</button>
-                                    </div>
+                        <div className="mb-10 relative">
+                            {loading && (
+                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-10 rounded-lg backdrop-blur-sm">
+                                    <RefreshCw className="animate-spin text-white w-12 h-12" />
                                 </div>
-                            </div>
+                            )}
+                            <CharacterSheet 
+                                character={character} 
+                                onReroll={handleReroll} 
+                                onSave={handleSave} 
+                                onExportPDF={() => handleExportPDF()} 
+                            />
                         </div>
-                        <div className="flex gap-4 items-center text-center">
-                            <div className="hidden md:flex gap-2">
-                                <div className="bg-white p-2 rounded border border-slate-300 min-w-[60px]">
-                                    <div className="text-xs text-slate-500 uppercase font-bold">CA</div>
-                                    <div className="text-xl font-bold flex justify-center items-center gap-1"><Shield size={16} className="text-slate-400" />{character.armorClass}</div>
-                                </div>
-                                <div className="bg-white p-2 rounded border border-slate-300 min-w-[60px]">
-                                    <div className="text-xs text-slate-500 uppercase font-bold">PV</div>
-                                    <div className="text-xl font-bold text-red-600">{character.hp}</div>
-                                </div>
-                            </div>
-                            
-                            <div className="w-px h-10 bg-slate-300 mx-2"></div>
-
-                            <button onClick={() => handleExportPDF()} className="bg-slate-700 hover:bg-slate-800 text-white p-2 rounded flex items-center gap-2 transition" title="Baixar PDF">
-                                <Download size={20} /> <span className="hidden sm:inline">PDF</span>
-                            </button>
-                            <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white p-2 rounded flex items-center gap-2 transition" title="Salvar na Biblioteca">
-                                <Save size={20} /> <span className="hidden sm:inline">Salvar</span>
-                            </button>
-                        </div>
-                        </div>
-
-                        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center border-b border-slate-300 pb-1">
-                                    <h3 className="font-bold text-slate-700">Atributos</h3>
-                                    <button onClick={() => handleReroll('stats')} className="text-xs text-amber-600 hover:text-amber-700 font-bold flex items-center gap-1"><RefreshCw size={12} /> Re-rolar</button>
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                {Object.entries(character.stats).map(([key, value]) => {
-                                    const mod = character.modifiers[key as keyof typeof character.modifiers];
-                                    return (
-                                    <div key={key} className="bg-white p-2 rounded border border-slate-200 text-center flex flex-col items-center justify-center">
-                                        <div className="text-xs text-slate-500 font-bold uppercase mb-1">{key}</div>
-                                        <div className="text-2xl font-bold text-slate-800 leading-none">
-                                            {mod >= 0 ? `+${mod}` : mod}
-                                        </div>
-                                        <div className="text-xs text-slate-400 font-mono mt-1 bg-slate-100 px-2 rounded-full">
-                                            {value}
-                                        </div>
-                                    </div>
-                                    );
-                                })}
-                                </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                <div>
-                                    <h3 className="font-bold text-slate-700 border-b border-slate-300 pb-1 mb-2 flex items-center gap-2"><Sword size={16} /> Combate</h3>
-                                    <ul className="text-sm space-y-1 text-slate-700">
-                                        <li><span className="font-semibold">Proficiência:</span> +{character.proficiencyBonus}</li>
-                                        <li><span className="font-semibold">Dado de Vida:</span> d{character.class.hitDie}</li>
-                                        <li><span className="font-semibold">Deslocamento:</span> {character.race.speed} ft</li>
-                                        <li className="md:hidden"><span className="font-semibold">HP:</span> {character.hp} | <span className="font-semibold">CA:</span> {character.armorClass}</li>
-                                    </ul>
-                                </div>
-
-                                {character.spells && (
-                                    character.spells.cantrips.length > 0 || 
-                                    character.spells.level1.length > 0 ||
-                                    (character.spells.level2 && character.spells.level2.length > 0) ||
-                                    (character.spells.level3 && character.spells.level3.length > 0)
-                                ) && (
-                                    <div>
-                                        <h3 className="font-bold text-slate-700 border-b border-slate-300 pb-1 mb-2 flex items-center gap-2">
-                                            <Sparkles size={16} className="text-purple-600" /> Magias
-                                        </h3>
-                                        <div className="space-y-2 text-sm text-slate-700">
-                                            {character.spells.cantrips.length > 0 && (
-                                                <div>
-                                                    <span className="font-semibold text-purple-700">Truques:</span> {character.spells.cantrips.join(', ')}
-                                                </div>
-                                            )}
-                                            {character.spells.level1.length > 0 && (
-                                                <div>
-                                                    <span className="font-semibold text-purple-700">Nível 1:</span> {character.spells.level1.join(', ')}
-                                                </div>
-                                            )}
-                                            {character.spells.level2 && character.spells.level2.length > 0 && (
-                                                <div>
-                                                    <span className="font-semibold text-purple-700">Nível 2:</span> {character.spells.level2.join(', ')}
-                                                </div>
-                                            )}
-                                            {character.spells.level3 && character.spells.level3.length > 0 && (
-                                                <div>
-                                                    <span className="font-semibold text-purple-700">Nível 3:</span> {character.spells.level3.join(', ')}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {character.equipment && character.equipment.length > 0 && (
-                                    <div>
-                                        <h3 className="font-bold text-slate-700 border-b border-slate-300 pb-1 mb-2 flex items-center gap-2">
-                                            <Backpack size={16} /> Equipamento
-                                        </h3>
-                                        <ul className="text-sm text-slate-700 list-disc list-inside">
-                                            {character.equipment.map((item: string, idx: number) => (
-                                                <li key={idx}>{item}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-
-                                <div>
-                                    <h3 className="font-bold text-slate-700 border-b border-slate-300 pb-1 mb-2">Background: {character.background.name}</h3>
-                                    <p className="text-sm text-slate-600 italic mb-2">{character.background.description}</p>
-                                </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                <div>
-                                    <h3 className="font-bold text-slate-700 border-b border-slate-300 pb-1 mb-2 flex items-center gap-2"><Scroll size={16} /> Personalidade</h3>
-                                    <div className="space-y-2 text-sm">
-                                        <p><span className="font-semibold text-indigo-600">Traço:</span> {character.personality.trait}</p>
-                                        <p><span className="font-semibold text-indigo-600">Ideal:</span> {character.personality.ideal}</p>
-                                        <p><span className="font-semibold text-indigo-600">Vínculo:</span> {character.personality.bond}</p>
-                                        <p><span className="font-semibold text-indigo-600">Falha:</span> {character.personality.flaw}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     ) : (
-                        <div className="text-center py-20 opacity-50">
+                        <div className="text-center py-20 opacity-50 bg-slate-800/50 rounded-lg border border-slate-800">
                             <Dice5 size={64} className="mx-auto mb-4 text-slate-600" />
                             <h2 className="text-2xl font-bold text-slate-500">Sua aventura começa aqui</h2>
-                            <p className="text-slate-400">Clique em "Gerar Personagem" para criar sua primeira ficha.</p>
+                            <p className="text-slate-400">Clique em "Gerar Personagem" para criar sua primeira ficha completa.</p>
                         </div>
                     )}
                 </>
@@ -602,7 +296,7 @@ function FateForgeApp() {
                                         <div className="flex gap-3 items-center">
                                             <div className="w-12 h-12 rounded-lg bg-slate-900 border border-slate-600 overflow-hidden flex-shrink-0">
                                                 <img 
-                                                    src={getAvatarUrl(char.race.name)} 
+                                                    src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${char.race.name}-${char.name}`} 
                                                     alt="Avatar" 
                                                     className="w-full h-full object-cover"
                                                 />
@@ -630,9 +324,7 @@ function FateForgeApp() {
                                         </div>
                                     </div>
                                     <div className="flex gap-2 text-xs text-slate-500 mt-4 pt-2 border-t border-slate-700">
-                                        <span>HP: {char.hp}</span> • 
-                                        <span>CA: {char.armorClass}</span> • 
-                                        <span>Criado em: {char.createdAt ? new Date(char.createdAt).toLocaleDateString() : 'Hoje'}</span>
+                                        <span>HP: {(char.hp as any)?.max || char.hp}</span>
                                     </div>
                                 </div>
                             ))}
