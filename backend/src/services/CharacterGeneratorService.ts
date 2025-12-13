@@ -114,7 +114,7 @@ export class CharacterGeneratorService {
           // We will fill the legacy structure in the Controller or let the frontend handle the new one.
           // For now, let's just ignore the legacy structure if we changed the interface.
           return acc; 
-      }, {} as any) || {} as any, 
+      }, {} as any) || { cantrips: [], level1: [] } as any, // FIXED: Ensure valid structure or empty object compatible with legacy
       spellcasting, // New field
       background,
       personality,
