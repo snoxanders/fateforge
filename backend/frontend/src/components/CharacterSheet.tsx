@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Shield, Sword, Scroll, Heart, Zap, User, Backpack, RefreshCw, Download, Save } from 'lucide-react';
-import { jsPDF } from 'jspdf';
 
 // Define the interface to match backend structure
 export interface Character {
