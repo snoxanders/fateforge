@@ -3,7 +3,6 @@ import { CharacterController } from '../controllers/CharacterController';
 
 const router = Router();
 
-// Health Check
 router.get('/health', (req, res) => {
     res.json({ 
         status: 'ok', 
@@ -13,13 +12,11 @@ router.get('/health', (req, res) => {
     });
 });
 
-// Geração (Stateless)
 router.post('/generate', CharacterController.generate);
 router.post('/reroll', CharacterController.reroll);
 
-// Persistência (Database)
-router.post('/characters', CharacterController.save);      // Salvar
-router.get('/characters', CharacterController.list);       // Listar biblioteca
-router.delete('/characters/:id', CharacterController.delete); // Excluir
+router.post('/characters', CharacterController.save);
+router.get('/characters', CharacterController.list);
+router.delete('/characters/:id', CharacterController.delete);
 
 export default router;

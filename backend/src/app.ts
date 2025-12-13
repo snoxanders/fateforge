@@ -8,7 +8,6 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Routes
 app.use('/api', characterRoutes);
 
 app.get('/', (req, res) => {
@@ -22,4 +21,3 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export default app;
-
