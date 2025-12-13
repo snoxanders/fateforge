@@ -20,5 +20,6 @@
     "api/index.ts": {
       "maxDuration": 10
     }
-  }
+  },
+  "outputDirectory": "backend/frontend/dist"
 }
