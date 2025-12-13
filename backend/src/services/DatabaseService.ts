@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Character } from '../models/Character';
+import { Character, Attributes } from '../models/Character';
 
 const prisma = new PrismaClient();
 
@@ -17,20 +17,22 @@ export class DatabaseService {
         subclassId: character.subclass?.id || null,
         subclassName: character.subclass?.name || null,
         
-        hp: character.hp,
-        armorClass: character.armorClass,
+        hp: JSON.stringify(character.hp),
+        armorClass: JSON.stringify(character.armorClass),
         proficiencyBonus: character.proficiencyBonus,
         initiative: character.initiative,
         speed: character.speed,
         
-        stats: JSON.stringify(character.stats),
-        modifiers: JSON.stringify(character.modifiers),
+        attributes: JSON.stringify(character.attributes),
         skills: JSON.stringify(character.skills),
+        proficiencies: JSON.stringify(character.proficiencies),
         equipment: JSON.stringify(character.equipment),
+        wallet: JSON.stringify(character.wallet),
         spells: JSON.stringify(character.spells || {}),
         
         background: JSON.stringify(character.background),
-        personality: JSON.stringify(character.personality)
+        personality: JSON.stringify(character.personality),
+        bio: JSON.stringify(character.bio)
     };
 
     return await prisma.character.create({
@@ -55,20 +57,22 @@ export class DatabaseService {
         class: { id: record.classId, name: record.className, hitDie: 8 },
         subclass: record.subclassId ? { id: record.subclassId, name: record.subclassName } : undefined,
         
-        hp: record.hp,
-        armorClass: record.armorClass,
+        hp: JSON.parse(record.hp),
+        armorClass: JSON.parse(record.armorClass),
         proficiencyBonus: record.proficiencyBonus,
         initiative: record.initiative,
         speed: record.speed,
         
-        stats: JSON.parse(record.stats),
-        modifiers: JSON.parse(record.modifiers),
+        attributes: JSON.parse(record.attributes),
         skills: JSON.parse(record.skills),
+        proficiencies: JSON.parse(record.proficiencies),
         equipment: JSON.parse(record.equipment),
+        wallet: JSON.parse(record.wallet),
         spells: JSON.parse(record.spells),
         
         background: JSON.parse(record.background),
         personality: JSON.parse(record.personality),
+        bio: JSON.parse(record.bio),
         createdAt: record.createdAt.toISOString()
     }));
   }
