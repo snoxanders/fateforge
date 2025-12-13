@@ -38,7 +38,7 @@ function FateForgeApp() {
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedLevel, setSelectedLevel] = useState(1);
 
-  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001' : '');
+  const API_URL = import.meta.env.VITE_API_URL || '';
 
   const racesList = [
       { id: 'human', name: 'Humano' },
