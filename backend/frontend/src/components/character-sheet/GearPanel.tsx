@@ -8,7 +8,11 @@ interface GearPanelProps {
 
 export function GearPanel({ character }: GearPanelProps) {
   return (
-    <RPGCard title="Equipamento" icon={<Backpack size={18} />}>
+    <RPGCard 
+      title="Equipamento" 
+      icon={<Backpack size={18} />}
+      info="O que você carrega na mochila. Armas, armaduras (que mudam sua CA) e seu ouro. Cuidado com o peso!"
+    >
       <div className="mb-4 flex justify-between bg-stone-950/50 p-3 rounded border border-stone-800">
           <div className="text-center">
               <div className="text-amber-600 font-bold text-lg">{character.wallet.gp}</div>

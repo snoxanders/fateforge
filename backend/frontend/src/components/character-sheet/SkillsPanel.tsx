@@ -8,7 +8,11 @@ interface SkillsPanelProps {
 
 export function SkillsPanel({ character }: SkillsPanelProps) {
   return (
-    <RPGCard title="Perícias" className="h-full">
+    <RPGCard 
+      title="Perícias" 
+      className="h-full"
+      info="Coisas específicas que você sabe fazer bem. Se você é 'Proficiente' (bolinha pintada), soma seu bônus de proficiência ao teste."
+    >
       <div className="space-y-0.5">
         {character.skills && character.skills.map(skill => (
           <SkillRow

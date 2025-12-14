@@ -11,7 +11,12 @@ export function CombatPanel({ character }: CombatPanelProps) {
 
   return (
     <div className="space-y-6">
-      <RPGCard title="Ataques & Conjuração" icon={<Sword size={18} />} variant="default">
+      <RPGCard 
+        title="Ataques & Conjuração" 
+        icon={<Sword size={18} />} 
+        variant="default"
+        info="Tudo para a briga. 'Ataque' é o valor para acertar o inimigo, 'Dano' é quanto machuca. CA é sua Defesa (quanto é difícil te acertar)."
+      >
         <div className="space-y-3">
           {weapons.length === 0 ? (
             <div className="text-center py-4 text-stone-500 italic text-sm">Nenhuma arma equipada</div>

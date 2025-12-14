@@ -10,7 +10,13 @@ export function MagicPanel({ character }: MagicPanelProps) {
   if (!character.spells?.spells || character.spells.spells.length === 0) return null;
 
   return (
-    <RPGCard title="Magias" icon={<Zap size={18} />} variant="magic" className="mt-6">
+    <RPGCard 
+      title="Magias" 
+      icon={<Zap size={18} />} 
+      variant="magic" 
+      className="mt-6"
+      info="Seus poderes mágicos. 'Truques' são infinitos. Magias de nível gastam 'espaços' (slots) e precisam de descanso para voltar."
+    >
        <div className="grid grid-cols-3 gap-2 mb-4 bg-indigo-950/20 p-2 rounded border border-indigo-900/30">
           <div className="text-center">
               <div className="text-[10px] uppercase font-bold text-indigo-400">Atributo</div>

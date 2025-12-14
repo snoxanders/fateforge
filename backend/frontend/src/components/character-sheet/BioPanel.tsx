@@ -8,7 +8,11 @@ interface BioPanelProps {
 
 export function BioPanel({ character }: BioPanelProps) {
   return (
-    <RPGCard title="Biografia & Traços" icon={<Scroll size={18} />}>
+    <RPGCard 
+      title="Biografia & Traços" 
+      icon={<Scroll size={18} />}
+      info="Quem é você. Traços de personalidade ajudam a interpretar (RP). Seu Antecedente diz o que você era antes de se aventurar."
+    >
         <div className="space-y-4">
             <div>
                 <h4 className="text-xs font-bold text-stone-500 uppercase mb-1">Antecedente: <span className="text-stone-300">{character.background.name}</span></h4>
