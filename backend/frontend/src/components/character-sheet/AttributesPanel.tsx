@@ -17,7 +17,7 @@ export function AttributesPanel({ character, onReroll }: AttributesPanelProps) {
       title="Atributos"
       info="São seus dados base. Força, Destreza, etc. Eles definem seus modificadores (+1, +2) que são somados em quase tudo que você faz."
       action={
-        <button onClick={onReroll} className="text-stone-500 hover:text-amber-500 transition-colors" title="Rolar Atributos">
+        <button onClick={onReroll} className="text-stone-500 hover:text-amber-500 transition-colors ml-4" title="Rolar Atributos">
           <RefreshCw size={14} />
         </button>
       }
