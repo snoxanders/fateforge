@@ -37,7 +37,7 @@ export function CharacterSheet({ character, onReroll, onSave, onExportPDF }: Cha
           
           {/* Left Column: Core Stats (Attributes) - Span 2/12 on large, but maybe 3/12 is better */}
           <div className="md:col-span-3 lg:col-span-2 space-y-6">
-            <AttributesPanel character={character} onReroll={() => onReroll('stats')} />
+            <AttributesPanel character={character} />
           </div>
 
           {/* Center Column: Combat & Action - Span 5/12 or 6/12 */}

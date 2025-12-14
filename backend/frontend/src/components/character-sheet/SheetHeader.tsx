@@ -4,7 +4,7 @@ import { StatShield } from '../ui/StatDisplay';
 
 interface SheetHeaderProps {
   character: Character;
-  onReroll: (target: 'race' | 'class') => void;
+  onReroll: (target: 'race' | 'class' | 'stats') => void;
 }
 
 export function SheetHeader({ character, onReroll }: SheetHeaderProps) {
@@ -76,6 +76,9 @@ export function SheetHeader({ character, onReroll }: SheetHeaderProps) {
             </button>
             <button onClick={() => onReroll('class')} className="text-xs bg-stone-900 border border-stone-700 px-3 py-1 rounded text-stone-400 hover:text-amber-500 hover:border-amber-600 transition flex items-center gap-1">
               <RefreshCw size={12} /> Classe
+            </button>
+            <button onClick={() => onReroll('stats')} className="text-xs bg-stone-900 border border-stone-700 px-3 py-1 rounded text-stone-400 hover:text-amber-500 hover:border-amber-600 transition flex items-center gap-1">
+              <RefreshCw size={12} /> Atributos
             </button>
           </div>
         </div>
