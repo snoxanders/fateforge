@@ -41,3 +41,4 @@ export interface Character {
   bio: { age: number; height: string; weight: string; eyes: string; skin: string; hair: string; appearance: string; backstory: string; alignment: string };
 }
 
+

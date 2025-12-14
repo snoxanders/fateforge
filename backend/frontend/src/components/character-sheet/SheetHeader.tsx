@@ -8,7 +8,31 @@ interface SheetHeaderProps {
 }
 
 export function SheetHeader({ character, onReroll }: SheetHeaderProps) {
-  const getAvatarUrl = (raceName: string) => {
+    const getAvatarUrl = (raceName: string) => {
+    // Map race names to local asset filenames
+    const raceMap: {[key: string]: string} = {
+      'Humano': 'human',
+      'Alto Elfo': 'elf',
+      'Elfo da Floresta': 'wood-elf',
+      'Elfo Negro (Drow)': 'drow',
+      'Anão da Colina': 'dwarf',
+      'Anão da Montanha': 'dwarf',
+      'Halfling': 'halfling',
+      'Halfling Pés-Leves': 'halfling-lightfoot',
+      'Halfling Robusto': 'halfling-stout',
+      'Meio-Orc': 'orc',
+      'Tiefling': 'tiefling',
+      'Gnomo das Rochas': 'gnome',
+      'Gnomo da Floresta': 'forest-gnome',
+      'Meio-Elfo': 'half-elf',
+      'Draconato': 'dragonborn'
+    };
+    
+    const fileName = raceMap[raceName];
+    if (fileName) {
+      return `/assets/races/${fileName}.png`;
+    }
+    
     return `https://api.dicebear.com/7.x/adventurer/svg?seed=${raceName}-${character.name}`;
   };
 
@@ -20,11 +44,11 @@ export function SheetHeader({ character, onReroll }: SheetHeaderProps) {
       <div className="flex flex-col md:flex-row items-end gap-6 px-4 md:px-8 pt-8">
         {/* Avatar - Floating effect */}
         <div className="relative group">
-          <div className="w-32 h-32 md:w-40 md:h-40 bg-stone-900 rounded-xl border-4 border-stone-700 shadow-2xl overflow-hidden transform -rotate-2 hover:rotate-0 transition-all duration-300 z-10">
+          <div className="w-32 h-40 md:w-48 md:h-64 bg-stone-900 rounded-xl border-4 border-stone-700 shadow-2xl overflow-hidden transform -rotate-2 hover:rotate-0 transition-all duration-300 z-10">
             <img 
               src={getAvatarUrl(character.race.name)} 
               alt={character.race.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-top"
             />
           </div>
           {/* Level Badge */}
@@ -81,4 +105,3 @@ export function SheetHeader({ character, onReroll }: SheetHeaderProps) {
     </div>
   );
 }
-

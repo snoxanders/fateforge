@@ -121,3 +121,4 @@ export const generatePDF = (character: Character) => {
     doc.save(`${character.name.replace(/\s+/g, '_')}_FateForge.pdf`);
 };
 
+

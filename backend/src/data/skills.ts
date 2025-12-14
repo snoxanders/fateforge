@@ -21,3 +21,4 @@ export const SKILLS_MAPPING: { name: string; ability: keyof Attributes }[] = [
   { name: 'Sobrevivência', ability: 'WIS' },
 ];
 
+
