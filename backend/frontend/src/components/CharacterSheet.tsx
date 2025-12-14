@@ -1,4 +1,4 @@
-import { Download, Save } from 'lucide-react';
+import React from 'react';
 import { Character } from '../types/character';
 import { SheetHeader } from './character-sheet/SheetHeader';
 import { AttributesPanel } from './character-sheet/AttributesPanel';
