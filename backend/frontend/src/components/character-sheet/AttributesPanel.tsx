@@ -1,4 +1,3 @@
-import { RefreshCw } from 'lucide-react';
 import { Character } from '../../types/character';
 import { RPGCard } from '../ui/RPGCard';
 import { AttributeBox } from '../ui/StatDisplay';
