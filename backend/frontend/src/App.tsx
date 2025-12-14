@@ -25,12 +25,16 @@ function FateForgeApp() {
   const racesList = [
       { id: 'human', name: 'Humano' },
       { id: 'elf-high', name: 'Alto Elfo' },
+      { id: 'elf-wood', name: 'Elfo da Floresta' },
+      { id: 'elf-drow', name: 'Elfo Negro (Drow)' },
       { id: 'dwarf-hill', name: 'Anão da Colina' },
       { id: 'dwarf-mountain', name: 'Anão da Montanha' },
-      { id: 'halfling-lightfoot', name: 'Halfling' },
+      { id: 'halfling-lightfoot', name: 'Halfling Pés-Leves' },
+      { id: 'halfling-stout', name: 'Halfling Robusto' },
       { id: 'half-orc', name: 'Meio-Orc' },
       { id: 'tiefling', name: 'Tiefling' },
       { id: 'gnome-rock', name: 'Gnomo das Rochas' },
+      { id: 'gnome-forest', name: 'Gnomo da Floresta' },
       { id: 'half-elf', name: 'Meio-Elfo' },
       { id: 'dragonborn', name: 'Draconato' }
   ];
@@ -142,6 +146,28 @@ function FateForgeApp() {
 
   const handleExportPDF = (char: Character = character!) => {
      if (char) generatePDF(char);
+  };
+
+  const getAvatarUrl = (raceName: string, charName: string) => {
+    const raceMap: {[key: string]: string} = {
+      'Humano': 'human',
+      'Alto Elfo': 'elf',
+      'Elfo da Floresta': 'wood-elf',
+      'Elfo Negro (Drow)': 'drow',
+      'Anão da Colina': 'dwarf',
+      'Anão da Montanha': 'dwarf',
+      'Halfling Pés-Leves': 'halfling-lightfoot',
+      'Halfling Robusto': 'halfling-stout',
+      'Halfling': 'halfling',
+      'Meio-Orc': 'orc',
+      'Tiefling': 'tiefling',
+      'Gnomo das Rochas': 'gnome',
+      'Gnomo da Floresta': 'forest-gnome',
+      'Meio-Elfo': 'half-elf',
+      'Draconato': 'dragonborn'
+    };
+    const fileName = raceMap[raceName];
+    return fileName ? `/assets/races/${fileName}.png` : `https://api.dicebear.com/7.x/adventurer/svg?seed=${raceName}-${charName}`;
   };
 
   return (
@@ -296,9 +322,9 @@ function FateForgeApp() {
                                         <div className="flex gap-4 items-center">
                                             <div className="w-16 h-16 rounded-lg bg-stone-950 border border-stone-700 overflow-hidden flex-shrink-0 shadow-md">
                                                 <img 
-                                                    src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${char.race.name}-${char.name}`} 
+                                                    src={getAvatarUrl(char.race.name, char.name)} 
                                                     alt="Avatar" 
-                                                    className="w-full h-full object-cover"
+                                                    className="w-full h-full object-cover object-top"
                                                 />
                                             </div>
                                             <div>

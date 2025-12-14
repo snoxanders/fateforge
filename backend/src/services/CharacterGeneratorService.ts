@@ -109,13 +109,11 @@ export class CharacterGeneratorService {
 
   private calculateAttributes(raw: { [key: string]: number }, saves: string[]): Attributes {
       const stats = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
-      // Start with empty object cast as Partial<Attributes> or any then cast at end
       const attrs: any = {};
       
       stats.forEach(stat => {
           const value = raw[stat];
           const modifier = getModifier(value);
-          // Simplified save calculation: just mod for now, prof bonus logic handled elsewhere if needed or incomplete
           attrs[stat] = { value, modifier, save: modifier };
       });
       return attrs as Attributes; 
@@ -381,9 +379,7 @@ export class CharacterGeneratorService {
   private applyRaceBonuses(stats: any, race: Race): any {
     const newStats = { ...stats };
     const bonuses = race.abilityBonuses;
-    // Explicitly cast to string keys to allow indexing into stats: any
     (Object.keys(bonuses) as string[]).forEach((key) => {
-        // Safe access because stats is any, and bonuses[key as keyof Stats] exists
         const bonusValue = bonuses[key as keyof typeof bonuses];
         if (bonusValue) {
             newStats[key] += bonusValue;
@@ -414,4 +410,8 @@ export class CharacterGeneratorService {
       return table[level] || 0;
   }
 }
+
+
+
+
 

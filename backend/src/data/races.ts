@@ -25,6 +25,34 @@ export const RACES: Race[] = [
     languages: ['Comum', 'Élfico']
   },
   {
+    id: 'elf-wood',
+    name: 'Elfo da Floresta',
+    subrace: 'Elfo da Floresta',
+    speed: 35,
+    size: 'Medium',
+    abilityBonuses: { DEX: 2, WIS: 1 },
+    traits: [
+      { name: 'Visão no Escuro', description: 'Visão superior em escuridão e penumbra.' },
+      { name: 'Ancestralidade Feérica', description: 'Vantagem contra ser enfeitiçado, imune a sono mágico.' },
+      { name: 'Máscara da Natureza', description: 'Você pode tentar se esconder mesmo quando estiver apenas levemente obscurecido por folhagem, chuva forte, neve caindo, névoa ou outro fenômeno natural.' }
+    ],
+    languages: ['Comum', 'Élfico']
+  },
+  {
+    id: 'elf-drow',
+    name: 'Elfo Negro (Drow)',
+    subrace: 'Drow',
+    speed: 30,
+    size: 'Medium',
+    abilityBonuses: { DEX: 2, CHA: 1 },
+    traits: [
+      { name: 'Visão no Escuro Superior', description: 'Sua visão no escuro tem alcance de 36 metros (120 pés).' },
+      { name: 'Sensibilidade à Luz Solar', description: 'Você tem desvantagem nas jogadas de ataque e testes de Sabedoria (Percepção) relacionados à visão quando você ou o alvo do seu ataque ou o que você está tentando perceber está sob luz solar direta.' },
+      { name: 'Magia Drow', description: 'Você conhece o truque luzes dançantes.' }
+    ],
+    languages: ['Comum', 'Élfico']
+  },
+  {
     id: 'dwarf-hill',
     name: 'Anão da Colina',
     subrace: 'Anão da Colina',
@@ -49,6 +77,20 @@ export const RACES: Race[] = [
       { name: 'Sorte', description: 'Quando você rola um 1 no d20 para um ataque, teste de habilidade ou resistência, você pode rolar novamente o dado e deve usar o novo resultado.' },
       { name: 'Bravura', description: 'Você tem vantagem em testes de resistência contra ficar amedrontado.' },
       { name: 'Agilidade Halfling', description: 'Você pode se mover através do espaço de qualquer criatura que for de um tamanho maior que o seu.' }
+    ],
+    languages: ['Comum', 'Halfling']
+  },
+  {
+    id: 'halfling-stout',
+    name: 'Halfling Robusto',
+    subrace: 'Robusto',
+    speed: 25,
+    size: 'Small',
+    abilityBonuses: { DEX: 2, CON: 1 },
+    traits: [
+      { name: 'Sorte', description: 'Rerolar 1s em d20.' },
+      { name: 'Bravura', description: 'Vantagem contra medo.' },
+      { name: 'Resiliência dos Robustos', description: 'Você tem vantagem em testes de resistência contra veneno e resistência contra dano de veneno.' }
     ],
     languages: ['Comum', 'Halfling']
   },
@@ -94,11 +136,26 @@ export const RACES: Race[] = [
     languages: ['Comum', 'Gnomo']
   },
   {
+    id: 'gnome-forest',
+    name: 'Gnomo da Floresta',
+    subrace: 'Gnomo da Floresta',
+    speed: 25,
+    size: 'Small',
+    abilityBonuses: { INT: 2, DEX: 1 },
+    traits: [
+      { name: 'Visão no Escuro', description: 'Visão no escuro 60ft.' },
+      { name: 'Esperteza Gnômica', description: 'Vantagem em saves de INT/WIS/CHA contra magia.' },
+      { name: 'Ilusionista Nato', description: 'Você conhece o truque ilusão menor. Inteligência é sua habilidade de conjuração para ele.' },
+      { name: 'Falar com Bestas Pequenas', description: 'Através de sons e gestos, você pode comunicar ideias simples para Bestas pequenas ou menores.' }
+    ],
+    languages: ['Comum', 'Gnomo']
+  },
+  {
     id: 'half-elf',
     name: 'Meio-Elfo',
     speed: 30,
     size: 'Medium',
-    abilityBonuses: { CHA: 2, DEX: 1, CON: 1 }, // DEX e CON como sugestão de +1 flexível
+    abilityBonuses: { CHA: 2, DEX: 1, CON: 1 },
     traits: [
       { name: 'Visão no Escuro', description: 'Graças ao seu sangue élfico, você tem uma visão superior no escuro e na penumbra.' },
       { name: 'Ancestralidade Feérica', description: 'Você tem vantagem em testes de resistência contra ser enfeitiçado e magia não pode colocá-lo para dormir.' },
