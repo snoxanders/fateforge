@@ -30,7 +30,7 @@ export function CharacterSheet({ character, onReroll, onSave, onExportPDF }: Cha
       <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
         
         {/* Header Section */}
-        <SheetHeader character={character} onReroll={onReroll} />
+        <SheetHeader character={character} onReroll={onReroll} onSave={onSave} onExportPDF={onExportPDF} />
 
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
@@ -54,24 +54,6 @@ export function CharacterSheet({ character, onReroll, onSave, onExportPDF }: Cha
           </div>
 
         </div>
-      </div>
-
-      {/* Floating Action Buttons (Mobile/Desktop) */}
-      <div className="fixed bottom-6 right-6 flex gap-3 z-50">
-        <button 
-          onClick={onExportPDF}
-          className="bg-stone-800 hover:bg-stone-700 text-stone-200 p-4 rounded-full shadow-xl border border-stone-600 transition-transform hover:scale-105 group"
-          title="Exportar PDF"
-        >
-          <Download size={24} className="group-hover:text-amber-500 transition-colors" />
-        </button>
-        <button 
-          onClick={onSave}
-          className="bg-amber-600 hover:bg-amber-500 text-white p-4 rounded-full shadow-xl shadow-amber-900/20 border border-amber-400 transition-transform hover:scale-105"
-          title="Salvar Personagem"
-        >
-          <Save size={24} />
-        </button>
       </div>
     </div>
   );

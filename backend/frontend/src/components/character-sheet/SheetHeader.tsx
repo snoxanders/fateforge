@@ -1,13 +1,15 @@
-import { Shield, Heart, Zap, RefreshCw } from 'lucide-react';
+import { Shield, Heart, Zap, RefreshCw, Save, Download } from 'lucide-react';
 import { Character } from '../../types/character';
 import { StatShield } from '../ui/StatDisplay';
 
 interface SheetHeaderProps {
   character: Character;
   onReroll: (target: 'race' | 'class' | 'stats') => void;
+  onSave: () => void;
+  onExportPDF: () => void;
 }
 
-export function SheetHeader({ character, onReroll }: SheetHeaderProps) {
+export function SheetHeader({ character, onReroll, onSave, onExportPDF }: SheetHeaderProps) {
     const getAvatarUrl = (raceName: string) => {
     // Map race names to local asset filenames
     const raceMap: {[key: string]: string} = {
@@ -40,6 +42,24 @@ export function SheetHeader({ character, onReroll }: SheetHeaderProps) {
     <div className="relative mb-12">
       {/* Background Banner */}
       <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-gray-900 to-gray-950 border-b border-stone-800 rounded-b-3xl -z-10" />
+
+      {/* Top Right Actions */}
+      <div className="absolute top-4 right-4 flex gap-2 z-20">
+        <button 
+          onClick={onExportPDF}
+          className="bg-stone-800/80 hover:bg-stone-700 text-stone-300 p-2 rounded-full border border-stone-600 transition-colors shadow-lg backdrop-blur-sm"
+          title="Exportar PDF"
+        >
+          <Download size={18} />
+        </button>
+        <button 
+          onClick={onSave}
+          className="bg-amber-600/90 hover:bg-amber-500 text-white p-2 rounded-full border border-amber-400 transition-colors shadow-lg backdrop-blur-sm"
+          title="Salvar Personagem"
+        >
+          <Save size={18} />
+        </button>
+      </div>
 
       <div className="flex flex-col md:flex-row items-end gap-6 px-4 md:px-8 pt-8">
         {/* Avatar - Floating effect */}
