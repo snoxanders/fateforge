@@ -56,7 +56,9 @@ describe('Invariantes por classe (nível 1 e 5)', () => {
         expect(c.skills).toHaveLength(18);
         for (const sk of c.skills) {
           const mod = c.attributes[sk.ability].modifier;
-          if (sk.proficient) {
+          if (sk.expertise) {
+            expect(sk.value).toBe(mod + 2 * c.proficiencyBonus);
+          } else if (sk.proficient) {
             expect(sk.value).toBe(mod + c.proficiencyBonus);
           } else {
             expect(sk.value).toBe(mod);
@@ -173,6 +175,84 @@ describe('ASI escalonado (T2.3)', () => {
     for (const id of ['fighter', 'wizard', 'barbarian']) {
       const c = gen(555, id, 20);
       for (const s of STATS) expect(c.attributes[s].value, `${id} ${s}`).toBeLessThanOrEqual(20);
+    }
+  });
+});
+
+describe('Bio, idiomas e ouro (T3.1 / T3.2)', () => {
+  const parseH = (h: string) => parseFloat(h.replace(',', '.').replace('m', ''));
+
+  function gr(seed: number, raceId: string) {
+    return new CharacterGeneratorService(seed).generateCharacter('Teste', { level: 1, raceId, classId: 'fighter', method: 'roll' });
+  }
+
+  it('raças Pequenas têm altura coerente (< 1,20m)', () => {
+    for (const id of ['halfling-lightfoot', 'halfling-stout', 'gnome-rock', 'gnome-forest']) {
+      const c = gr(1, id);
+      expect(parseH(c.bio.height), id).toBeLessThan(1.2);
+    }
+  });
+
+  it('Draconato é alto (> 1,70m) e idade dentro da faixa', () => {
+    const c = gr(1, 'dragonborn');
+    expect(parseH(c.bio.height)).toBeGreaterThan(1.7);
+    expect(c.bio.age).toBeGreaterThanOrEqual(15);
+    expect(c.bio.age).toBeLessThanOrEqual(60);
+  });
+
+  it('Elfo é longevo (idade pode passar de 100)', () => {
+    // com seed fixa, garante faixa ampla; testa o teto da faixa
+    let maxAge = 0;
+    for (let s = 0; s < 20; s++) maxAge = Math.max(maxAge, gr(s, 'elf-high').bio.age);
+    expect(maxAge).toBeGreaterThan(100);
+  });
+
+  it('idiomas: sem placeholders e sem duplicatas', () => {
+    for (const id of ['human', 'half-elf', 'elf-high', 'dwarf-hill']) {
+      const langs = gr(2, id).proficiencies.languages;
+      for (const l of langs) {
+        expect(l.toLowerCase()).not.toContain('escolha');
+        expect(l).not.toBe('Idioma Extra');
+      }
+      expect(new Set(langs).size, `${id} sem duplicatas`).toBe(langs.length);
+      expect(langs).toContain('Comum');
+    }
+  });
+
+  it('ouro > 0 e nenhum item de moeda no inventário', () => {
+    const c = gr(2, 'human');
+    expect(c.wallet.gp).toBeGreaterThan(0);
+    for (const item of c.equipment) {
+      expect(/^\d+\s*(po|pp|pc)\b/i.test(item.name), `item moeda: ${item.name}`).toBe(false);
+    }
+  });
+
+  it('tendência (alignment) coerente e não-vazia', () => {
+    const c = gr(2, 'human');
+    expect(c.bio.alignment).toBeTruthy();
+    expect(c.personality.ideals[0]).toBeTruthy();
+  });
+});
+
+describe('Especialização / Expertise (T3.3)', () => {
+  it('Ladino nv1 tem 2 perícias com Especialização (PB dobrado)', () => {
+    const c = gen(11, 'rogue', 1);
+    const exp = c.skills.filter(s => s.expertise);
+    expect(exp).toHaveLength(2);
+    for (const sk of exp) {
+      expect(sk.proficient).toBe(true);
+      expect(sk.value).toBe(c.attributes[sk.ability].modifier + 2 * c.proficiencyBonus);
+    }
+  });
+
+  it('Bardo: sem Especialização no nv1, com 2 no nv3', () => {
+    expect(gen(11, 'bard', 1).skills.filter(s => s.expertise)).toHaveLength(0);
+    expect(gen(11, 'bard', 3).skills.filter(s => s.expertise)).toHaveLength(2);
+  });
+
+  it('classes sem Especialização não recebem o bônus', () => {
+    for (const id of ['fighter', 'wizard', 'cleric']) {
+      expect(gen(11, id, 5).skills.some(s => s.expertise), id).toBe(false);
     }
   });
 });

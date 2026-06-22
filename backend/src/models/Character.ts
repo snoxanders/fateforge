@@ -21,6 +21,7 @@ export interface Skill {
   ability: keyof Attributes;
   value: number;
   proficient: boolean;
+  expertise?: boolean; // PB dobrado (Ladino nv1 / Bardo nv3)
 }
 
 export interface SpellSlot {

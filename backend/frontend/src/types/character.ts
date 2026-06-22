@@ -18,7 +18,7 @@ export interface Character {
   speed: number;
   passivePerception: number;
   
-  skills: { name: string; value: number; proficient: boolean; ability: string }[];
+  skills: { name: string; value: number; proficient: boolean; expertise?: boolean; ability: string }[];
   
   proficiencies: {
     armor: string[];

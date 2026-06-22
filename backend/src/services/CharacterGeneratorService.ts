@@ -1,4 +1,4 @@
-import { Character, GenerationPreferences, GenerationMethod, Attributes, Skill, Spellcasting, SpellSlot, EquipmentItem, Bio, CharacterBackground, PersonalityTraits } from '../models/Character';
+import { Character, GenerationPreferences, GenerationMethod, Attributes, Skill, Spellcasting, SpellSlot, EquipmentItem, Wallet, Bio, CharacterBackground, PersonalityTraits } from '../models/Character';
 import { RACES } from '../data/races';
 import { CLASSES } from '../data/classes';
 import { BACKGROUNDS, BackgroundData } from '../data/backgrounds';
@@ -7,6 +7,25 @@ import { SPELLS } from '../data/spells';
 import { roll4d6DropLowest, getModifier, mulberry32, RNG } from '../utils/dice';
 import { Race } from '../models/Race';
 import { Class, Subclass, ClassFeature } from '../models/Class';
+
+// Físico aproximado por raça (PHB): altura em cm [min,max], peso em kg [min,max], idade [min,max].
+type Physique = { h: [number, number]; w: [number, number]; age: [number, number] };
+const RACE_PHYSIQUE: { [raceId: string]: Physique } = {
+  'human':              { h: [160, 185], w: [60, 90],  age: [18, 55] },
+  'elf-high':           { h: [165, 190], w: [50, 75],  age: [100, 500] },
+  'elf-wood':           { h: [165, 190], w: [50, 75],  age: [100, 500] },
+  'elf-drow':           { h: [160, 180], w: [50, 70],  age: [100, 500] },
+  'dwarf-hill':         { h: [120, 140], w: [60, 90],  age: [40, 250] },
+  'dwarf-mountain':     { h: [125, 145], w: [70, 100], age: [40, 250] },
+  'halfling-lightfoot': { h: [85, 100],  w: [16, 22],  age: [20, 100] },
+  'halfling-stout':     { h: [85, 100],  w: [16, 22],  age: [20, 100] },
+  'half-orc':           { h: [170, 200], w: [80, 120], age: [14, 55] },
+  'tiefling':           { h: [160, 185], w: [60, 90],  age: [18, 55] },
+  'gnome-rock':         { h: [90, 105],  w: [15, 20],  age: [40, 300] },
+  'gnome-forest':       { h: [90, 105],  w: [15, 20],  age: [40, 300] },
+  'half-elf':           { h: [160, 185], w: [55, 85],  age: [20, 120] },
+  'dragonborn':         { h: [175, 200], w: [90, 130], age: [15, 60] },
+};
 
 export class CharacterGeneratorService {
 
@@ -70,11 +89,13 @@ export class CharacterGeneratorService {
         feature: `${bgData.feature.name}: ${bgData.feature.description}`
     };
 
-    const personality = this.generatePersonality(bgData);
-    const bio = this.generateBio(race, bgData, name, level);
+    const chosenIdeal = this.pickOne(bgData.ideals);
+    const personality = this.generatePersonality(bgData, chosenIdeal);
+    const bio = this.generateBio(race, bgData, name, chosenIdeal.align);
 
     const proficiencies = this.calculateProficiencies(characterClass, race, bgData, modifiers);
     const skills = this.calculateSkills(proficiencies.skillNames, attributes, proficiencyBonus);
+    this.applyExpertise(skills, characterClass, level, proficiencyBonus);
 
     const equipment = this.generateEquipment(characterClass, bgData);
     const armorClass = this.calculateAC(modifiers.DEX, modifiers.CON, modifiers.WIS, characterClass, activeFeatures, equipment);
@@ -102,11 +123,11 @@ export class CharacterGeneratorService {
         armor: characterClass.proficiencies.armor,
         weapons: characterClass.proficiencies.weapons,
         tools: [...characterClass.proficiencies.tools, ...bgData.toolProficiencies],
-        languages: [...race.languages, ...(new Array(bgData.languages || 0).fill('Idioma Extra'))],
+        languages: this.resolveLanguages(race, bgData.languages || 0),
         savingThrows: characterClass.proficiencies.savingThrows as (keyof Attributes)[]
       },
       equipment,
-      wallet: { cp: 0, sp: 0, ep: 0, gp: 15, pp: 0 },
+      wallet: this.computeWallet(bgData),
       spellcasting, 
       background,
       personality,
@@ -142,6 +163,21 @@ export class CharacterGeneratorService {
               proficient: isProficient
           };
       });
+  }
+
+  // Especialização: dobra o PB em perícias proficientes (Ladino nv1, Bardo nv3).
+  private applyExpertise(skills: Skill[], charClass: Class, level: number, pb: number): void {
+      let count = 0;
+      if (charClass.id === 'rogue' && level >= 1) count = 2;
+      if (charClass.id === 'bard' && level >= 3) count = 2;
+      if (count === 0) return;
+
+      const proficient = skills.filter(s => s.proficient);
+      const chosen = this.pickRandom(proficient, count);
+      for (const sk of chosen) {
+          sk.expertise = true;
+          sk.value += pb; // já tinha 1x PB; agora 2x
+      }
   }
 
   private calculateProficiencies(charClass: Class, race: Race, bg: BackgroundData, modifiers: any) {
@@ -272,9 +308,37 @@ export class CharacterGeneratorService {
       };
 
       charClass.startingEquipment.forEach(s => items.push(parseItem(s)));
-      bg.equipment.forEach(s => items.push(parseItem(s)));
+      // Itens que são apenas moeda (ex.: "15 po") viram saldo da bolsa, não item de inventário.
+      bg.equipment.forEach(s => { if (!this.isCurrency(s)) items.push(parseItem(s)); });
 
       return items;
+  }
+
+  private isCurrency(s: string): boolean {
+      return /^\s*\d+\s*(po|pp|pe|pl|pc)\b/i.test(s);
+  }
+
+  private computeWallet(bg: BackgroundData): Wallet {
+      let gp = 0;
+      for (const item of bg.equipment) {
+          const m = item.match(/(\d+)\s*po\b/i);
+          if (m) gp += parseInt(m[1]);
+      }
+      return { cp: 0, sp: 0, ep: 0, gp: gp || 10, pp: 0 };
+  }
+
+  // Resolve idiomas: substitui "à escolha" e idiomas extras do antecedente por idiomas reais do pool.
+  private resolveLanguages(race: Race, extraCount: number): string[] {
+      const pool = ['Anão', 'Élfico', 'Gigante', 'Gnômico', 'Goblin', 'Halfling', 'Orc', 'Dracônico', 'Abissal', 'Celestial', 'Infernal', 'Silvestre', 'Subterrâneo (Submundo)'];
+      const known: string[] = [];
+      let pending = extraCount;
+      for (const l of race.languages) {
+          if (l.toLowerCase().includes('escolha')) pending++;
+          else if (!known.includes(l)) known.push(l);
+      }
+      const available = pool.filter(l => !known.includes(l));
+      const picks = this.pickRandom(available, pending);
+      return [...known, ...picks];
   }
 
   private generateSpellcasting(charClass: Class, race: Race, level: number, attributes: Attributes, pb: number): Spellcasting | undefined {
@@ -330,15 +394,22 @@ export class CharacterGeneratorService {
       return defined.length ? table[defined[0]] : {};
   }
 
-  private generateBio(race: Race, bg: BackgroundData, name: string, level: number): Bio {
+  private randInt(min: number, max: number): number {
+      return min + Math.floor(this.rng() * (max - min + 1));
+  }
+
+  private generateBio(race: Race, bg: BackgroundData, name: string, alignment: string): Bio {
+      const p = RACE_PHYSIQUE[race.id] || RACE_PHYSIQUE['human'];
+      const cm = this.randInt(p.h[0], p.h[1]);
+      const kg = this.randInt(p.w[0], p.w[1]);
       return {
-          age: 20 + Math.floor(this.rng() * 20),
-          height: "1,75m",
-          weight: "75kg",
-          eyes: "Castanhos",
-          skin: "Clara",
-          hair: "Castanho",
-          alignment: bg.ideals[0]?.align || "Neutro",
+          age: this.randInt(p.age[0], p.age[1]),
+          height: `${(cm / 100).toFixed(2).replace('.', ',')}m`,
+          weight: `${kg}kg`,
+          eyes: this.pickOne(['Castanhos', 'Azuis', 'Verdes', 'Âmbar', 'Cinzentos', 'Negros']),
+          skin: this.pickOne(['Clara', 'Morena', 'Bronzeada', 'Escura', 'Pálida', 'Avermelhada']),
+          hair: this.pickOne(['Castanho', 'Negro', 'Loiro', 'Ruivo', 'Grisalho', 'Branco']),
+          alignment: alignment || 'Neutro',
           appearance: `Um ${race.name} de aparência marcante, vestindo roupas de ${bg.name.toLowerCase()}.`,
           backstory: `Nascido como ${race.name}, ${name} cresceu sob a influência de um passado de ${bg.name}. ${bg.description}`
       };
@@ -364,10 +435,10 @@ export class CharacterGeneratorService {
     return BACKGROUNDS[Math.floor(this.rng() * BACKGROUNDS.length)];
   }
   
-  private generatePersonality(bg: BackgroundData): PersonalityTraits {
+  private generatePersonality(bg: BackgroundData, chosenIdeal: { text: string; align: string }): PersonalityTraits {
       return {
           traits: [this.pickOne(bg.personalityTraits)],
-          ideals: [this.pickOne(bg.ideals).text],
+          ideals: [chosenIdeal.text], // mesmo ideal usado para derivar a tendência (bio)
           bonds: [this.pickOne(bg.bonds)],
           flaws: [this.pickOne(bg.flaws)]
       };

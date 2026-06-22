@@ -93,19 +93,21 @@ interface SkillRowProps {
   modifier: number;
   proficient: boolean;
   ability: string;
+  expertise?: boolean;
 }
 
-export function SkillRow({ name, modifier, proficient, ability }: SkillRowProps) {
+export function SkillRow({ name, modifier, proficient, ability, expertise }: SkillRowProps) {
   return (
-    <div className={`flex items-center justify-between py-1.5 px-2 border-b border-stone-800 hover:bg-stone-800/50 transition-colors group cursor-default rounded-sm ${proficient ? 'bg-amber-900/10' : ''}`}>
+    <div className={`flex items-center justify-between py-1.5 px-2 border-b border-stone-800 hover:bg-stone-800/50 transition-colors group cursor-default rounded-sm ${expertise ? 'bg-emerald-900/10' : proficient ? 'bg-amber-900/10' : ''}`}>
       <div className="flex items-center gap-2">
-        <div className={`w-2.5 h-2.5 rounded-sm rotate-45 border ${proficient ? 'bg-amber-500 border-amber-600' : 'border-stone-600 bg-transparent'}`} />
+        <div className={`w-2.5 h-2.5 rounded-sm rotate-45 border ${expertise ? 'bg-emerald-400 border-emerald-500' : proficient ? 'bg-amber-500 border-amber-600' : 'border-stone-600 bg-transparent'}`} />
         <span className={`text-sm ${proficient ? 'text-stone-200 font-bold' : 'text-stone-400'} group-hover:text-amber-100`}>
           {name}
         </span>
         <span className="text-[10px] text-stone-600 font-mono uppercase">({ability})</span>
+        {expertise && <span className="text-[9px] font-bold uppercase text-emerald-400 border border-emerald-700/50 rounded px-1" title="Especialização: bônus de proficiência dobrado">Esp</span>}
       </div>
-      <span className={`font-serif font-bold ${proficient ? 'text-amber-500' : 'text-stone-500'}`}>
+      <span className={`font-serif font-bold ${expertise ? 'text-emerald-400' : proficient ? 'text-amber-500' : 'text-stone-500'}`}>
         {modifier >= 0 ? `+${modifier}` : modifier}
       </span>
     </div>

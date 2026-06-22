@@ -20,6 +20,7 @@ export function SkillsPanel({ character }: SkillsPanelProps) {
             name={skill.name}
             modifier={skill.value}
             proficient={skill.proficient}
+            expertise={skill.expertise}
             ability={skill.ability}
           />
         ))}
