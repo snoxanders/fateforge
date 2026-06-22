@@ -7,7 +7,7 @@ import { CharacterSheet, Character } from './components/CharacterSheet';
 import { generatePDF } from './utils/pdfExport';
 import { RPGCard } from './components/ui/RPGCard';
 
-function FateForgeApp() {
+function CharvoApp() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'generator' | 'library'>('generator');
   const [name, setName] = useState('');
@@ -176,7 +176,7 @@ function FateForgeApp() {
       <nav className="bg-black/40 border-b border-stone-800 p-4 sticky top-0 z-50 backdrop-blur-md">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex items-center gap-2 text-amber-500 font-serif font-bold text-2xl tracking-wide">
-                <Dice5 className="text-amber-600" /> FateForge
+                <Dice5 className="text-amber-600" /> Charvo
             </div>
             <div className="flex items-center gap-4">
                 <div className="flex gap-2">
@@ -379,7 +379,7 @@ function FateForgeApp() {
 export default function App() {
     return (
         <AuthProvider>
-            <FateForgeApp />
+            <CharvoApp />
         </AuthProvider>
     );
 }

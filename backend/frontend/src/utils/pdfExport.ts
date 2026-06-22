@@ -118,7 +118,7 @@ export const generatePDF = (character: Character) => {
     y += 6;
     doc.text(`Defeito: ${character.personality.flaws[0]}`, 20, y);
 
-    doc.save(`${character.name.replace(/\s+/g, '_')}_FateForge.pdf`);
+    doc.save(`${character.name.replace(/\s+/g, '_')}_Charvo.pdf`);
 };
 
 
