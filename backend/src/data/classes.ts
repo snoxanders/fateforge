@@ -71,6 +71,14 @@ export const CLASSES: Class[] = [
             features: [
                 { name: 'Crítico Aprimorado', level: 3, description: 'Seus ataques com arma adquirem um acerto crítico numa rolagem 19 ou 20.' }
             ]
+        },
+        {
+            id: 'battle-master',
+            name: 'Mestre de Batalha',
+            description: 'Você emprega manobras marciais aprendidas com o domínio de técnicas de combate.',
+            features: [
+                { name: 'Manobras de Combate', level: 3, description: 'Você aprende manobras alimentadas por dados de superioridade (d8) para controlar o campo de batalha.' }
+            ]
         }
     ]
   },
@@ -115,6 +123,14 @@ export const CLASSES: Class[] = [
             features: [
                 { name: 'Esculpir Magias', level: 2, description: 'Você pode criar bolsões de segurança relativa dentro dos efeitos de suas magias de evocação.' }
             ]
+        },
+        {
+            id: 'school-abjuration',
+            name: 'Escola de Abjuração',
+            description: 'Você foca no estudo da magia de proteção, bloqueio e banimento.',
+            features: [
+                { name: 'Proteção Arcana', level: 2, description: 'Você cria uma barreira mágica que absorve dano e se recarrega ao conjurar magias de abjuração.' }
+            ]
         }
     ]
   },
@@ -157,6 +173,14 @@ export const CLASSES: Class[] = [
             features: [
                 { name: 'Mãos Rápidas', level: 3, description: 'Você pode usar a ação bônus concedida pela sua Ação Astuta para fazer um teste de Destreza (Prestidigitação), usar suas ferramentas de ladrão para desarmar uma armadilha ou abrir uma fechadura, ou realizar a ação de Usar um Objeto.' },
                 { name: 'Andarilho de Telhados', level: 3, description: 'Você ganha a habilidade de escalar mais rápido.' }
+            ]
+        },
+        {
+            id: 'assassin',
+            name: 'Assassino',
+            description: 'Você foca na arte sombria de tirar vidas, especializando-se em disfarce, veneno e o golpe mortal.',
+            features: [
+                { name: 'Assassinar', level: 3, description: 'Você tem vantagem contra criaturas que ainda não agiram; qualquer acerto contra um alvo surpreso é crítico.' }
             ]
         }
     ]
@@ -204,6 +228,15 @@ export const CLASSES: Class[] = [
             features: [
                 { name: 'Discípulo da Vida', level: 1, description: 'Suas magias de cura são mais efetivas.' },
                 { name: 'Canalizar Divindade: Preservar a Vida', level: 2, description: 'Você pode usar seu Canalizar Divindade para curar os feridos.' }
+            ]
+        },
+        {
+            id: 'war-domain',
+            name: 'Domínio da Guerra',
+            description: 'O domínio da Guerra é dedicado a deuses do combate, da honra e da vitória nas batalhas.',
+            features: [
+                { name: 'Sacerdote de Guerra', level: 1, description: 'Sua divindade lhe concede ataques bônus em combate, baseados no seu modificador de Sabedoria.' },
+                { name: 'Canalizar Divindade: Ataque Guiado', level: 2, description: 'Você pode usar Canalizar Divindade para garantir vantagem em uma jogada de ataque.' }
             ]
         }
     ]
@@ -254,6 +287,15 @@ export const CLASSES: Class[] = [
             features: [
                 { name: 'Palavras Cortantes', level: 3, description: 'Você aprende como usar sua sagacidade para distrair, confundir e minar a confiança e competência de outros.' }
             ]
+        },
+        {
+            id: 'college-valor',
+            name: 'Colégio da Bravura',
+            description: 'Bardos do Colégio da Bravura são contadores de histórias corajosos que inspiram heróis em batalha.',
+            features: [
+                { name: 'Proficiências Bônus', level: 3, description: 'Você ganha proficiência em armaduras médias, escudos e armas marciais.' },
+                { name: 'Inspiração de Combate', level: 3, description: 'Aliados podem usar sua Inspiração de Bardo para adicionar o dado ao dano ou à CA.' }
+            ]
         }
     ]
   },
@@ -303,6 +345,14 @@ export const CLASSES: Class[] = [
             features: [
                 { name: 'Canalizar Divindade: Arma Sagrada', level: 3, description: 'Você pode imbuir uma arma que esteja segurando com energia positiva.' }
             ]
+        },
+        {
+            id: 'oath-ancients',
+            name: 'Juramento dos Anciões',
+            description: 'O Juramento dos Anciões vincula o paladino aos princípios eternos do bem e da luz contra a escuridão.',
+            features: [
+                { name: 'Canalizar Divindade: Fúria da Natureza', level: 3, description: 'Você invoca raízes e vinhas espectrais para prender seus inimigos.' }
+            ]
         }
     ]
   },
@@ -344,6 +394,14 @@ export const CLASSES: Class[] = [
             description: 'Para alguns bárbaros, a fúria é um meio para um fim, mas para você é o fim em si.',
             features: [
                 { name: 'Frenesi', level: 3, description: 'Você pode entrar em frenesi quando em fúria, permitindo fazer um ataque corpo-a-corpo como ação bônus.' }
+            ]
+        },
+        {
+            id: 'path-totem',
+            name: 'Caminho do Guerreiro Totêmico',
+            description: 'Você adota um espírito animal como guia, protetor e inspiração.',
+            features: [
+                { name: 'Espírito Totêmico', level: 3, description: 'Escolha um animal totêmico (Urso, Águia, Lobo) e ganhe um benefício relacionado durante a fúria.' }
             ]
         }
     ]
@@ -392,6 +450,14 @@ export const CLASSES: Class[] = [
             features: [
                 { name: 'Presa do Caçador', level: 3, description: 'Você ganha uma das seguintes características: Matador de Colossos, Matador de Gigantes ou Quebrador de Hordas.' }
             ]
+        },
+        {
+            id: 'beast-master',
+            name: 'Mestre das Feras',
+            description: 'Você forma um vínculo místico com um companheiro animal que luta ao seu lado.',
+            features: [
+                { name: 'Companheiro Animal', level: 3, description: 'Você ganha uma besta companheira que age conforme suas ordens em combate.' }
+            ]
         }
     ]
   },
@@ -439,6 +505,14 @@ export const CLASSES: Class[] = [
                 { name: 'Resiliência Dracônica', level: 1, description: 'A magia flui através do seu corpo, fazendo com que traços físicos de seus ancestrais dragões surjam.' },
                 { name: 'Afinidade Elemental', level: 6, description: 'Quando você conjura uma magia que causa dano do tipo associado ao seu ancestral dracônico, você pode adicionar seu modificador de Carisma ao dano.' }
             ]
+        },
+        {
+            id: 'wild-magic',
+            name: 'Magia Selvagem',
+            description: 'Sua magia provém do caos imprevisível das forças primordiais do multiverso.',
+            features: [
+                { name: 'Surto de Magia Selvagem', level: 1, description: 'Sua magia pode disparar efeitos aleatórios e caóticos quando você conjura magias.' }
+            ]
         }
     ]
   },
@@ -481,6 +555,14 @@ export const CLASSES: Class[] = [
             description: 'Monges do Caminho da Mão Aberta são os mestres supremos do combate de artes marciais.',
             features: [
                 { name: 'Técnica da Mão Aberta', level: 3, description: 'Você pode manipular o ki do seu inimigo quando acerta seus ataques.' }
+            ]
+        },
+        {
+            id: 'shadow',
+            name: 'Caminho das Sombras',
+            description: 'Monges deste caminho seguem uma tradição que valoriza o sigilo e a furtividade nas sombras.',
+            features: [
+                { name: 'Artes das Sombras', level: 3, description: 'Você pode gastar ki para conjurar magias de sombra como escuridão, passos silenciosos e visão no escuro.' }
             ]
         }
     ]
@@ -529,6 +611,14 @@ export const CLASSES: Class[] = [
             features: [
                 { name: 'Bênção do Tenebroso', level: 1, description: 'Quando você reduz uma criatura hostil a 0 pontos de vida, você ganha pontos de vida temporários.' }
             ]
+        },
+        {
+            id: 'archfey',
+            name: 'O Arquifada',
+            description: 'Seu patrono é um lorde ou dama das fadas, um ser de magia antiga e caprichos imprevisíveis.',
+            features: [
+                { name: 'Presença Feérica', level: 1, description: 'Você pode encantar ou amedrontar as criaturas ao seu redor com a magia da corte feérica.' }
+            ]
         }
     ]
   },
@@ -575,6 +665,14 @@ export const CLASSES: Class[] = [
             features: [
                 { name: 'Truque Bônus', level: 2, description: 'Você aprende um truque de druida adicional à sua escolha.' },
                 { name: 'Recuperação Natural', level: 2, description: 'Você pode recuperar alguma energia mágica meditando.' }
+            ]
+        },
+        {
+            id: 'circle-moon',
+            name: 'Círculo da Lua',
+            description: 'Druidas do Círculo da Lua são guardiões ferozes que dominam a Forma Selvagem para o combate.',
+            features: [
+                { name: 'Forma de Combate', level: 2, description: 'Você pode assumir formas de bestas mais poderosas e usar Forma Selvagem como ação bônus.' }
             ]
         }
     ]

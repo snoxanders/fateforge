@@ -19,6 +19,7 @@ function FateForgeApp() {
   const [selectedRace, setSelectedRace] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedLevel, setSelectedLevel] = useState(1);
+  const [selectedMethod, setSelectedMethod] = useState<'roll' | 'standard' | 'point-buy'>('roll');
 
   const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -80,7 +81,7 @@ function FateForgeApp() {
       const payload = {
         name: name || undefined,
         level: selectedLevel,
-        method: 'roll',
+        method: selectedMethod,
         raceId: selectedRace || undefined,
         classId: selectedClass || undefined
       };
@@ -225,7 +226,7 @@ function FateForgeApp() {
                             </div>
 
                             {showAdvanced && (
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-stone-950/30 p-6 rounded border border-stone-800/50 animate-fade-in">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 bg-stone-950/30 p-6 rounded border border-stone-800/50 animate-fade-in">
                                     <div>
                                         <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Raça</label>
                                         <select 
@@ -258,6 +259,18 @@ function FateForgeApp() {
                                             onChange={(e) => setSelectedLevel(parseInt(e.target.value))}
                                             className="w-full h-2 bg-stone-800 rounded-lg appearance-none cursor-pointer accent-amber-600 mt-3"
                                         />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Atributos</label>
+                                        <select
+                                            value={selectedMethod}
+                                            onChange={(e) => setSelectedMethod(e.target.value as 'roll' | 'standard' | 'point-buy')}
+                                            className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-stone-200 focus:ring-1 focus:ring-amber-600 outline-none"
+                                        >
+                                            <option value="roll">Rolar (4d6)</option>
+                                            <option value="standard">Array Padrão</option>
+                                            <option value="point-buy">Compra de Pontos</option>
+                                        </select>
                                     </div>
                                 </div>
                             )}

@@ -380,5 +380,157 @@ export const SPELLS: Spell[] = [
     duration: 'Concentração, até 10 min',
     description: 'Uma nuvem de tempestade aparece. Você pode chamar relâmpagos que causam 3d10 de dano elétrico (DEX save metade).',
     classes: ['druid']
+  },
+
+  // --- TRUQUES adicionais ---
+  {
+    id: 'ray-of-frost', name: 'Raio de Gelo', level: 0, school: 'Evocação',
+    castingTime: '1 ação', range: '18 metros', components: 'V, S', duration: 'Instantânea',
+    description: 'Um feixe gélido atinge uma criatura. Ataque de magia: 1d8 de frio e reduz o deslocamento do alvo em 3m.',
+    classes: ['wizard', 'sorcerer']
+  },
+  {
+    id: 'minor-illusion', name: 'Ilusão Menor', level: 0, school: 'Ilusão',
+    castingTime: '1 ação', range: '9 metros', components: 'S, M', duration: '1 minuto',
+    description: 'Você cria um som ou imagem ilusória de um objeto até o fim da duração.',
+    classes: ['wizard', 'sorcerer', 'bard', 'warlock']
+  },
+  {
+    id: 'guidance', name: 'Orientação', level: 0, school: 'Adivinhação',
+    castingTime: '1 ação', range: 'Toque', components: 'V, S', duration: 'Concentração, até 1 min',
+    description: 'O alvo soma 1d4 a um teste de habilidade à sua escolha antes do fim da duração.',
+    classes: ['cleric', 'druid']
+  },
+  {
+    id: 'chill-touch', name: 'Toque Gélido', level: 0, school: 'Necromancia',
+    castingTime: '1 ação', range: '36 metros', components: 'V, S', duration: '1 rodada',
+    description: 'Uma mão esquelética espectral agarra o alvo. Ataque de magia: 1d8 necrótico e impede cura por 1 turno.',
+    classes: ['wizard', 'sorcerer', 'warlock']
+  },
+  {
+    id: 'poison-spray', name: 'Borrifo Venenoso', level: 0, school: 'Conjuração',
+    castingTime: '1 ação', range: '3 metros', components: 'V, S', duration: 'Instantânea',
+    description: 'Você lança um jato de gás tóxico. O alvo faz um teste de CON ou sofre 1d12 de dano de veneno.',
+    classes: ['wizard', 'sorcerer', 'druid', 'warlock']
+  },
+  {
+    id: 'spare-the-dying', name: 'Estabilizar os Mortos', level: 0, school: 'Necromancia',
+    castingTime: '1 ação', range: 'Toque', components: 'V, S', duration: 'Instantânea',
+    description: 'Você toca uma criatura com 0 PV e a estabiliza, impedindo que morra.',
+    classes: ['cleric']
+  },
+  {
+    id: 'druidcraft', name: 'Truque Druídico', level: 0, school: 'Transmutação',
+    castingTime: '1 ação', range: '9 metros', components: 'V, S', duration: 'Instantânea',
+    description: 'Você produz um pequeno efeito natural: prever o clima, florir uma semente, criar um som natural.',
+    classes: ['druid']
+  },
+  {
+    id: 'dancing-lights', name: 'Luzes Dançantes', level: 0, school: 'Evocação',
+    castingTime: '1 ação', range: '36 metros', components: 'V, S, M', duration: 'Concentração, até 1 min',
+    description: 'Você cria até quatro luzes flutuantes que pode mover com o pensamento.',
+    classes: ['wizard', 'sorcerer', 'bard']
+  },
+
+  // --- NÍVEL 1 adicionais ---
+  {
+    id: 'burning-hands', name: 'Mãos Flamejantes', level: 1, school: 'Evocação',
+    castingTime: '1 ação', range: 'Pessoal (cone 4,5m)', components: 'V, S', duration: 'Instantânea',
+    description: 'Um leque de chamas se espalha. Cada criatura na área faz teste de DEX, sofrendo 3d6 de fogo (metade se passar).',
+    classes: ['wizard', 'sorcerer']
+  },
+  {
+    id: 'charm-person', name: 'Enfeitiçar Pessoa', level: 1, school: 'Encantamento',
+    castingTime: '1 ação', range: '9 metros', components: 'V, S', duration: '1 hora',
+    description: 'Um humanoide deve passar num teste de WIS ou fica enfeitiçado por você até o fim da duração.',
+    classes: ['wizard', 'sorcerer', 'bard', 'druid', 'warlock']
+  },
+  {
+    id: 'detect-magic', name: 'Detectar Magia', level: 1, school: 'Adivinhação',
+    castingTime: '1 ação', range: 'Pessoal (9m)', components: 'V, S', duration: 'Concentração, até 10 min',
+    description: 'Você sente a presença de magia em 9 metros e pode identificar a escola de cada aura.',
+    classes: ['wizard', 'sorcerer', 'bard', 'cleric', 'druid', 'paladin', 'ranger']
+  },
+  {
+    id: 'faerie-fire', name: 'Fogo Feérico', level: 1, school: 'Evocação',
+    castingTime: '1 ação', range: '18 metros', components: 'V', duration: 'Concentração, até 1 min',
+    description: 'Objetos e criaturas numa área ficam delineados em luz; ataques contra eles têm vantagem.',
+    classes: ['bard', 'druid']
+  },
+  {
+    id: 'command', name: 'Comando', level: 1, school: 'Encantamento',
+    castingTime: '1 ação', range: '18 metros', components: 'V', duration: '1 rodada',
+    description: 'Você dá uma ordem de uma palavra; o alvo obedece se falhar num teste de WIS.',
+    classes: ['cleric', 'paladin']
+  },
+  {
+    id: 'hunters-mark', name: 'Marca do Caçador', level: 1, school: 'Adivinhação',
+    castingTime: '1 ação bônus', range: '27 metros', components: 'V', duration: 'Concentração, até 1 hora',
+    description: 'Você marca um alvo; causa 1d6 de dano extra a cada acerto e tem vantagem para rastreá-lo.',
+    classes: ['ranger']
+  },
+  {
+    id: 'disguise-self', name: 'Disfarçar-se', level: 1, school: 'Ilusão',
+    castingTime: '1 ação', range: 'Pessoal', components: 'V, S', duration: '1 hora',
+    description: 'Você altera magicamente sua aparência (roupas, rosto e voz) até o fim da duração.',
+    classes: ['wizard', 'sorcerer', 'bard']
+  },
+
+  // --- NÍVEL 2 adicionais ---
+  {
+    id: 'darkness', name: 'Escuridão', level: 2, school: 'Evocação',
+    castingTime: '1 ação', range: '18 metros', components: 'V, M', duration: 'Concentração, até 10 min',
+    description: 'Escuridão mágica se espalha num raio de 4,5m, bloqueando até visão no escuro.',
+    classes: ['wizard', 'sorcerer', 'warlock']
+  },
+  {
+    id: 'aid', name: 'Auxílio', level: 2, school: 'Abjuração',
+    castingTime: '1 ação', range: '9 metros', components: 'V, S, M', duration: '8 horas',
+    description: 'Até três criaturas têm seu máximo e atual de PV aumentados em 5.',
+    classes: ['cleric', 'paladin']
+  },
+  {
+    id: 'flaming-sphere', name: 'Esfera Flamejante', level: 2, school: 'Conjuração',
+    castingTime: '1 ação', range: '18 metros', components: 'V, S, M', duration: 'Concentração, até 1 min',
+    description: 'Uma esfera de fogo de 1,5m que você move; causa 2d6 de fogo a quem se aproxima (DEX save).',
+    classes: ['wizard', 'sorcerer', 'druid']
+  },
+  {
+    id: 'lesser-restoration', name: 'Restauração Menor', level: 2, school: 'Abjuração',
+    castingTime: '1 ação', range: 'Toque', components: 'V, S', duration: 'Instantânea',
+    description: 'Você cura uma criatura de uma doença ou de uma condição (cego, surdo, paralisado ou envenenado).',
+    classes: ['cleric', 'druid', 'paladin', 'ranger', 'bard']
+  },
+  {
+    id: 'moonbeam', name: 'Raio Lunar', level: 2, school: 'Evocação',
+    castingTime: '1 ação', range: '36 metros', components: 'V, S, M', duration: 'Concentração, até 1 min',
+    description: 'Um feixe de luar de 1,5m que você move; causa 2d10 radiante a quem entra na área (CON save metade).',
+    classes: ['druid']
+  },
+
+  // --- NÍVEL 3 adicionais ---
+  {
+    id: 'lightning-bolt', name: 'Relâmpago', level: 3, school: 'Evocação',
+    castingTime: '1 ação', range: 'Pessoal (linha 30m)', components: 'V, S, M', duration: 'Instantânea',
+    description: 'Um raio em linha causa 8d6 de dano elétrico a todos na linha (DEX save metade).',
+    classes: ['wizard', 'sorcerer']
+  },
+  {
+    id: 'dispel-magic', name: 'Dissipar Magia', level: 3, school: 'Abjuração',
+    castingTime: '1 ação', range: '36 metros', components: 'V, S', duration: 'Instantânea',
+    description: 'Encerra efeitos mágicos sobre uma criatura, objeto ou área.',
+    classes: ['wizard', 'sorcerer', 'cleric', 'druid', 'paladin', 'warlock', 'bard']
+  },
+  {
+    id: 'haste', name: 'Acelerar', level: 3, school: 'Transmutação',
+    castingTime: '1 ação', range: '9 metros', components: 'V, S, M', duration: 'Concentração, até 1 min',
+    description: 'O alvo dobra o deslocamento, ganha +2 de CA, vantagem em testes de DEX e uma ação adicional.',
+    classes: ['wizard', 'sorcerer']
+  },
+  {
+    id: 'conjure-animals', name: 'Conjurar Animais', level: 3, school: 'Conjuração',
+    castingTime: '1 ação', range: '18 metros', components: 'V, S', duration: 'Concentração, até 1 hora',
+    description: 'Você invoca espíritos feéricos em forma de bestas para lutar ao seu lado.',
+    classes: ['druid', 'ranger']
   }
 ];
