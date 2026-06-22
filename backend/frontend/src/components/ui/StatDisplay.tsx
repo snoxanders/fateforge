@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-// --- Attribute Box ---
+// --- Attribute Box (compacto, pensado para grid 3 colunas no mobile) ---
 interface AttributeBoxProps {
   label: string;
   value: number;
@@ -10,34 +10,26 @@ interface AttributeBoxProps {
 }
 
 export function AttributeBox({ label, value, modifier, save, onRoll }: AttributeBoxProps) {
-  const modStr = modifier >= 0 ? `+${modifier}` : modifier;
-  const saveStr = save !== undefined ? (save >= 0 ? `+${save}` : save) : null;
+  const modStr = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+  const saveStr = save !== undefined ? (save >= 0 ? `+${save}` : `${save}`) : null;
 
   return (
-    <div 
-      className="bg-stone-900 border-2 border-stone-700 rounded-lg p-2 flex flex-col items-center shadow-lg hover:border-amber-600/60 transition-colors cursor-pointer group"
+    <button
+      type="button"
       onClick={onRoll}
+      className="flex flex-col items-center rounded-xl border border-stone-700/80 bg-stone-900/80 px-1 py-2.5 active:scale-95 active:border-amber-600/60 transition-all"
     >
-      <div className="text-[10px] font-bold text-stone-500 tracking-widest uppercase mb-1 group-hover:text-amber-500 transition-colors">
-        {label}
-      </div>
-      <div className="text-3xl font-serif font-bold text-stone-100 leading-none mb-1 text-shadow">
-        {modStr}
-      </div>
-      <div className="w-10 h-10 bg-stone-800 rounded-full flex items-center justify-center border border-stone-600 text-sm font-bold text-stone-400 mb-1">
-        {value}
-      </div>
-      {saveStr && (
-        <div className="text-[10px] text-stone-500 flex items-center gap-1 mt-1">
-          <span>Sv:</span>
-          <span className="text-stone-300 font-bold">{saveStr}</span>
-        </div>
-      )}
-    </div>
+      <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500/80">{label}</span>
+      <span className="my-0.5 font-serif text-2xl font-bold leading-none text-stone-100 text-shadow-sm">{modStr}</span>
+      <span className="flex items-center gap-1 text-[10px] text-stone-500">
+        <span className="rounded bg-stone-800 px-1.5 py-0.5 font-bold text-stone-300">{value}</span>
+        {saveStr && <span className="text-stone-500">sv {saveStr}</span>}
+      </span>
+    </button>
   );
 }
 
-// --- Stat Shield (AC, etc) ---
+// --- Stat Chip (CA / HP / Iniciativa) — limpo e sempre cabe em 3 colunas ---
 interface StatShieldProps {
   label: string;
   value: number | string;
@@ -48,41 +40,20 @@ interface StatShieldProps {
 
 export function StatShield({ label, value, sublabel, icon, variant = 'default' }: StatShieldProps) {
   const styles = {
-    default: {
-      bg: 'bg-stone-800',
-      border: 'border-stone-600',
-      text: 'text-stone-100',
-      icon: 'text-stone-500'
-    },
-    hp: {
-      bg: 'bg-red-950/40',
-      border: 'border-red-800',
-      text: 'text-red-400',
-      icon: 'text-red-500'
-    },
-    initiative: {
-      bg: 'bg-amber-950/40',
-      border: 'border-amber-700',
-      text: 'text-amber-400',
-      icon: 'text-amber-500'
-    }
+    default: { bg: 'bg-stone-900/80', border: 'border-stone-600', text: 'text-stone-100', icon: 'text-stone-400' },
+    hp: { bg: 'bg-red-950/30', border: 'border-red-800/70', text: 'text-red-300', icon: 'text-red-500' },
+    initiative: { bg: 'bg-amber-950/30', border: 'border-amber-700/70', text: 'text-amber-300', icon: 'text-amber-500' },
   };
-
-  const style = styles[variant];
+  const s = styles[variant];
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">{label}</div>
-      <div className={`relative w-20 h-20 flex items-center justify-center ${style.bg} clip-path-shield`}>
-        {/* We can use CSS clip-path or an SVG background. Let's try a simple bordered div for now but styled like a shield or box */}
-        <div className={`w-16 h-16 rounded-xl rotate-45 border-2 ${style.border} flex items-center justify-center shadow-inner`}>
-           <div className="-rotate-45 flex flex-col items-center justify-center">
-              {icon && <span className={`mb-0.5 ${style.icon}`}>{icon}</span>}
-              <span className={`text-2xl font-serif font-bold ${style.text} text-shadow`}>{value}</span>
-           </div>
-        </div>
-      </div>
-      {sublabel && <div className="text-[10px] text-stone-500 mt-1 font-medium">{sublabel}</div>}
+    <div className={`flex flex-col items-center justify-center rounded-2xl border ${s.border} ${s.bg} px-2 py-2.5 shadow-lg`}>
+      <span className={`mb-0.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-stone-500`}>
+        {icon && <span className={s.icon}>{icon}</span>}
+        {label}
+      </span>
+      <span className={`font-serif text-2xl font-bold leading-none ${s.text} text-shadow`}>{value}</span>
+      {sublabel && <span className="mt-0.5 text-[9px] text-stone-600">{sublabel}</span>}
     </div>
   );
 }
@@ -98,19 +69,16 @@ interface SkillRowProps {
 
 export function SkillRow({ name, modifier, proficient, ability, expertise }: SkillRowProps) {
   return (
-    <div className={`flex items-center justify-between py-1.5 px-2 border-b border-stone-800 hover:bg-stone-800/50 transition-colors group cursor-default rounded-sm ${expertise ? 'bg-emerald-900/10' : proficient ? 'bg-amber-900/10' : ''}`}>
-      <div className="flex items-center gap-2">
-        <div className={`w-2.5 h-2.5 rounded-sm rotate-45 border ${expertise ? 'bg-emerald-400 border-emerald-500' : proficient ? 'bg-amber-500 border-amber-600' : 'border-stone-600 bg-transparent'}`} />
-        <span className={`text-sm ${proficient ? 'text-stone-200 font-bold' : 'text-stone-400'} group-hover:text-amber-100`}>
-          {name}
-        </span>
-        <span className="text-[10px] text-stone-600 font-mono uppercase">({ability})</span>
-        {expertise && <span className="text-[9px] font-bold uppercase text-emerald-400 border border-emerald-700/50 rounded px-1" title="Especialização: bônus de proficiência dobrado">Esp</span>}
+    <div className={`flex items-center justify-between rounded-md px-2 py-2 ${expertise ? 'bg-emerald-900/10' : proficient ? 'bg-amber-900/10' : ''}`}>
+      <div className="flex min-w-0 items-center gap-2">
+        <span className={`h-2.5 w-2.5 flex-shrink-0 rotate-45 rounded-sm border ${expertise ? 'border-emerald-500 bg-emerald-400' : proficient ? 'border-amber-600 bg-amber-500' : 'border-stone-600 bg-transparent'}`} />
+        <span className={`truncate text-sm ${proficient ? 'font-semibold text-stone-200' : 'text-stone-400'}`}>{name}</span>
+        <span className="flex-shrink-0 font-mono text-[9px] uppercase text-stone-600">({ability})</span>
+        {expertise && <span className="flex-shrink-0 rounded border border-emerald-700/50 px-1 text-[8px] font-bold uppercase text-emerald-400">Esp</span>}
       </div>
-      <span className={`font-serif font-bold ${expertise ? 'text-emerald-400' : proficient ? 'text-amber-500' : 'text-stone-500'}`}>
+      <span className={`flex-shrink-0 pl-2 font-serif font-bold ${expertise ? 'text-emerald-400' : proficient ? 'text-amber-500' : 'text-stone-500'}`}>
         {modifier >= 0 ? `+${modifier}` : modifier}
       </span>
     </div>
   );
 }
-

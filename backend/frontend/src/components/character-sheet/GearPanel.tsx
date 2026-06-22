@@ -42,9 +42,9 @@ export function GearPanel({ character }: GearPanelProps) {
       
       <div className="mt-4 pt-4 border-t border-stone-800">
           <h4 className="text-xs font-bold text-stone-500 uppercase mb-2">Proficiências</h4>
-          <div className="text-xs text-stone-400 space-y-1">
-              <p><span className="text-stone-600">Armas:</span> {character.proficiencies.weapons.join(', ')}</p>
-              <p><span className="text-stone-600">Armaduras:</span> {character.proficiencies.armor.join(', ')}</p>
+          <div className="space-y-1 text-xs text-stone-400">
+              <p className="break-words"><span className="text-stone-600">Armas:</span> {character.proficiencies.weapons.join(', ')}</p>
+              <p className="break-words"><span className="text-stone-600">Armaduras:</span> {character.proficiencies.armor.join(', ') || '—'}</p>
           </div>
       </div>
     </RPGCard>

@@ -10,119 +10,73 @@ interface SheetHeaderProps {
 }
 
 export function SheetHeader({ character, onReroll, onSave, onExportPDF }: SheetHeaderProps) {
-    const getAvatarUrl = (raceName: string) => {
-    // Map race names to local asset filenames
-    const raceMap: {[key: string]: string} = {
-      'Humano': 'human',
-      'Alto Elfo': 'elf',
-      'Elfo da Floresta': 'wood-elf',
-      'Elfo Negro (Drow)': 'drow',
-      'Anão da Colina': 'dwarf',
-      'Anão da Montanha': 'dwarf',
-      'Halfling': 'halfling',
-      'Halfling Pés-Leves': 'halfling-lightfoot',
-      'Halfling Robusto': 'halfling-stout',
-      'Meio-Orc': 'orc',
-      'Tiefling': 'tiefling',
-      'Gnomo das Rochas': 'gnome',
-      'Gnomo da Floresta': 'forest-gnome',
-      'Meio-Elfo': 'half-elf',
-      'Draconato': 'dragonborn'
+  const getAvatarUrl = (raceName: string) => {
+    const raceMap: { [key: string]: string } = {
+      'Humano': 'human', 'Alto Elfo': 'elf', 'Elfo da Floresta': 'wood-elf', 'Elfo Negro (Drow)': 'drow',
+      'Anão da Colina': 'dwarf', 'Anão da Montanha': 'dwarf', 'Halfling': 'halfling',
+      'Halfling Pés-Leves': 'halfling-lightfoot', 'Halfling Robusto': 'halfling-stout', 'Meio-Orc': 'orc',
+      'Tiefling': 'tiefling', 'Gnomo das Rochas': 'gnome', 'Gnomo da Floresta': 'forest-gnome',
+      'Meio-Elfo': 'half-elf', 'Draconato': 'dragonborn',
     };
-    
     const fileName = raceMap[raceName];
-    if (fileName) {
-      return `/assets/races/${fileName}.png`;
-    }
-    
-    return `https://api.dicebear.com/7.x/adventurer/svg?seed=${raceName}-${character.name}`;
+    return fileName ? `/assets/races/${fileName}.png` : `https://api.dicebear.com/7.x/adventurer/svg?seed=${raceName}-${character.name}`;
   };
 
+  const rerollBtn = "flex items-center gap-1 rounded-lg border border-stone-700 bg-stone-900/80 px-2.5 py-1.5 text-xs font-semibold text-stone-300 active:scale-95 active:border-amber-600 transition";
+
   return (
-    <div className="relative mb-12">
-      {/* Background Banner */}
-      <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-gray-900 to-gray-950 border-b border-stone-800 rounded-b-3xl -z-10" />
+    <div className="mb-5">
+      <div className="relative overflow-hidden rounded-2xl border border-stone-800 bg-gradient-to-b from-stone-900 to-stone-950 p-4 shadow-xl">
+        {/* brilho decorativo */}
+        <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-600/10 blur-2xl" />
 
-      {/* Top Right Actions */}
-      <div className="absolute top-4 right-4 flex gap-2 z-20">
-        <button 
-          onClick={onExportPDF}
-          className="bg-stone-800/80 hover:bg-stone-700 text-stone-300 p-2 rounded-full border border-stone-600 transition-colors shadow-lg backdrop-blur-sm"
-          title="Exportar PDF"
-        >
-          <Download size={18} />
-        </button>
-        <button 
-          onClick={onSave}
-          className="bg-amber-600/90 hover:bg-amber-500 text-white p-2 rounded-full border border-amber-400 transition-colors shadow-lg backdrop-blur-sm"
-          title="Salvar Personagem"
-        >
-          <Save size={18} />
-        </button>
-      </div>
-
-      <div className="flex flex-col md:flex-row items-end gap-6 px-4 md:px-8 pt-8">
-        {/* Avatar - Floating effect */}
-        <div className="relative group">
-          <div className="w-32 h-40 md:w-48 md:h-64 bg-stone-900 rounded-xl border-4 border-stone-700 shadow-2xl overflow-hidden transform -rotate-2 hover:rotate-0 transition-all duration-300 z-10">
-            <img 
-              src={getAvatarUrl(character.race.name)} 
-              alt={character.race.name}
-              className="w-full h-full object-cover object-top"
-            />
+        {/* Avatar + identidade */}
+        <div className="flex items-center gap-4">
+          <div className="relative flex-shrink-0">
+            <div className="h-24 w-20 overflow-hidden rounded-xl border-2 border-stone-700 bg-stone-900 shadow-lg">
+              <img src={getAvatarUrl(character.race.name)} alt={character.race.name} className="h-full w-full object-cover object-top" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-stone-950 bg-amber-600 text-sm font-bold text-white shadow-lg">
+              {character.level}
+            </div>
           </div>
-          {/* Level Badge */}
-          <div className="absolute -bottom-3 -right-3 w-10 h-10 bg-amber-600 rounded-full border-2 border-stone-900 flex items-center justify-center font-bold text-white shadow-lg z-20">
-            {character.level}
+
+          <div className="min-w-0 flex-1">
+            <h1 className="bg-gradient-to-r from-amber-400 to-amber-200 bg-clip-text font-serif text-2xl font-bold leading-tight text-transparent line-clamp-2">
+              {character.name}
+            </h1>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              <span className="rounded-full bg-stone-800/80 px-2 py-0.5 text-[11px] font-medium text-stone-300">{character.race.name}</span>
+              <span className="rounded-full bg-stone-800/80 px-2 py-0.5 text-[11px] font-medium text-stone-300">
+                {character.class.name}{character.subclass ? ` · ${character.subclass.name}` : ''}
+              </span>
+              <span className="rounded-full bg-stone-800/50 px-2 py-0.5 text-[11px] italic text-stone-500">{character.bio?.alignment || 'Neutro'}</span>
+            </div>
           </div>
         </div>
 
-        {/* Character Info */}
-        <div className="flex-1 pb-2">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-200 tracking-wide drop-shadow-sm">
-            {character.name}
-          </h1>
-          <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-stone-400 font-medium mt-2">
-            <span className="text-stone-300">{character.race.name}</span>
-            <span className="text-stone-600">•</span>
-            <span className="text-stone-300">{character.class.name} {character.subclass ? `(${character.subclass.name})` : ''}</span>
-            <span className="text-stone-600">•</span>
-            <span className="text-stone-500 italic">{character.bio?.alignment || 'Neutro'}</span>
-          </div>
-
-          <div className="flex gap-2 mt-4 opacity-60 hover:opacity-100 transition-opacity">
-            <button onClick={() => onReroll('race')} className="text-xs bg-stone-900 border border-stone-700 px-3 py-1 rounded text-stone-400 hover:text-amber-500 hover:border-amber-600 transition flex items-center gap-1">
-              <RefreshCw size={12} /> Raça
-            </button>
-            <button onClick={() => onReroll('class')} className="text-xs bg-stone-900 border border-stone-700 px-3 py-1 rounded text-stone-400 hover:text-amber-500 hover:border-amber-600 transition flex items-center gap-1">
-              <RefreshCw size={12} /> Classe
-            </button>
-            <button onClick={() => onReroll('stats')} className="text-xs bg-stone-900 border border-stone-700 px-3 py-1 rounded text-stone-400 hover:text-amber-500 hover:border-amber-600 transition flex items-center gap-1">
-              <RefreshCw size={12} /> Atributos
-            </button>
-          </div>
+        {/* Stats principais */}
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <StatShield label="CA" value={character.armorClass?.value || 10} icon={<Shield size={12} />} />
+          <StatShield label="HP" value={character.hp?.max || 10} variant="hp" icon={<Heart size={12} />} sublabel="máx" />
+          <StatShield label="Inic." value={character.initiative >= 0 ? `+${character.initiative}` : character.initiative} variant="initiative" icon={<Zap size={12} />} />
         </div>
 
-        {/* Quick Stats - Floating Shields */}
-        <div className="flex gap-4 pb-2">
-          <StatShield 
-            label="CA" 
-            value={character.armorClass?.value || 10} 
-            icon={<Shield size={14} />} 
-          />
-          <StatShield 
-            label="HP" 
-            value={character.hp?.max || 10} 
-            variant="hp"
-            icon={<Heart size={14} />} 
-            sublabel="Máximo"
-          />
-          <StatShield 
-            label="Iniciativa" 
-            value={character.initiative >= 0 ? `+${character.initiative}` : character.initiative} 
-            variant="initiative"
-            icon={<Zap size={14} />} 
-          />
+        {/* Reroll (sempre visível) */}
+        <div className="mt-4 flex gap-2">
+          <button onClick={() => onReroll('race')} className={rerollBtn}><RefreshCw size={12} /> Raça</button>
+          <button onClick={() => onReroll('class')} className={rerollBtn}><RefreshCw size={12} /> Classe</button>
+          <button onClick={() => onReroll('stats')} className={rerollBtn}><RefreshCw size={12} /> Atrib.</button>
+        </div>
+
+        {/* Ações principais */}
+        <div className="mt-3 flex gap-2">
+          <button onClick={onSave} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-600 py-2.5 text-sm font-bold text-white shadow-lg active:scale-95 active:bg-amber-500 transition">
+            <Save size={16} /> Salvar
+          </button>
+          <button onClick={onExportPDF} className="flex items-center justify-center gap-2 rounded-xl border border-stone-700 bg-stone-900 px-4 py-2.5 text-sm font-semibold text-stone-300 active:scale-95 transition">
+            <Download size={16} /> PDF
+          </button>
         </div>
       </div>
     </div>

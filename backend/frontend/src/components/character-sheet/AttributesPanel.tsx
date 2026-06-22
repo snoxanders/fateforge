@@ -15,7 +15,7 @@ export function AttributesPanel({ character }: AttributesPanelProps) {
       title="Atributos"
       info="São seus dados base. Força, Destreza, etc. Eles definem seus modificadores (+1, +2) que são somados em quase tudo que você faz."
     >
-      <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-3 gap-2">
         {attributes.map(attr => {
           const data = character.attributes[attr];
           if (!data) return null;

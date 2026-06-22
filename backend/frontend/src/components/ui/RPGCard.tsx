@@ -40,10 +40,10 @@ export function RPGCard({
       <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-amber-600/60 rounded-br-sm z-10 pointer-events-none" />
 
       {title && (
-        <div className={`px-4 py-3 flex items-center justify-between ${headerColors[variant]}`}>
-          <div className="flex items-center gap-2">
-            {icon && <span className="text-amber-500">{icon}</span>}
-            <h3 className="font-serif font-bold text-lg text-amber-500 tracking-wide uppercase text-shadow-sm">
+        <div className={`px-3 py-2.5 sm:px-4 sm:py-3 flex items-center justify-between ${headerColors[variant]}`}>
+          <div className="flex items-center gap-2 min-w-0">
+            {icon && <span className="text-amber-500 flex-shrink-0">{icon}</span>}
+            <h3 className="font-serif font-bold text-base sm:text-lg text-amber-500 tracking-wide uppercase text-shadow-sm truncate">
               {title}
             </h3>
             
@@ -64,7 +64,7 @@ export function RPGCard({
         </div>
       )}
       
-      <div className="p-4 relative">
+      <div className="p-3 sm:p-4 relative">
         {children}
       </div>
     </div>
