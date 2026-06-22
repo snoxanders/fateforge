@@ -1,6 +1,15 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { User, Session } from '@supabase/supabase-js';
+import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
+
+// No app nativo, o redirect do login precisa ser um deep link (esquema custom),
+// pois window.location.origin vira "localhost". Na web, usa a própria origem.
+const NATIVE = Capacitor.isNativePlatform();
+const REDIRECT_TO = NATIVE
+    ? 'app.charvo://auth'
+    : (typeof window !== 'undefined' ? window.location.origin : undefined);
 
 interface AuthContextType {
     user: User | null;
@@ -31,15 +40,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setLoading(false);
         });
 
-        return () => subscription.unsubscribe();
+        // No app nativo: captura a sessão quando o link mágico abre o app via deep link.
+        let removeDeepLink: (() => void) | undefined;
+        if (NATIVE) {
+            const handlePromise = App.addListener('appUrlOpen', async ({ url }) => {
+                if (!url || !url.includes('auth')) return;
+                try {
+                    const hash = url.split('#')[1];
+                    if (hash) {
+                        const params = new URLSearchParams(hash);
+                        const access_token = params.get('access_token');
+                        const refresh_token = params.get('refresh_token');
+                        if (access_token && refresh_token) {
+                            await supabase.auth.setSession({ access_token, refresh_token });
+                            return;
+                        }
+                    }
+                    const code = url.includes('code=') ? new URL(url).searchParams.get('code') : null;
+                    if (code) await supabase.auth.exchangeCodeForSession(code);
+                } catch (e) {
+                    console.error('Deep link auth error:', e);
+                }
+            });
+            removeDeepLink = () => { handlePromise.then(h => h.remove()); };
+        }
+
+        return () => {
+            subscription.unsubscribe();
+            if (removeDeepLink) removeDeepLink();
+        };
     }, []);
 
     const signInWithGoogle = async () => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
-            options: {
-                redirectTo: window.location.origin
-            }
+            options: { redirectTo: REDIRECT_TO }
         });
         if (error) console.error("Login error:", error);
     };
@@ -47,9 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const signInWithEmail = async (email: string) => {
         const { error } = await supabase.auth.signInWithOtp({
             email,
-            options: {
-                emailRedirectTo: window.location.origin
-            }
+            options: { emailRedirectTo: REDIRECT_TO }
         });
         if (error) throw error;
     };
