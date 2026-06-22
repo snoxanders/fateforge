@@ -31,8 +31,11 @@ export interface Character {
   equipment: { name: string; quantity: number; type?: string; properties?: string[]; armorClass?: number }[];
   wallet: { cp: number; sp: number; ep: number; gp: number; pp: number };
   
-  spells?: {
-      spellcasting?: { ability: string; saveDC: number; attackBonus: number; };
+  spellcasting?: {
+      ability: string;
+      saveDC: number;
+      attackBonus: number;
+      slots: { level: number; total: number; used: number }[];
       spells: { name: string; level: number; school?: string; prepared?: boolean }[];
   };
   

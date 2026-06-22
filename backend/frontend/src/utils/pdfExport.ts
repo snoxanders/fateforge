@@ -64,19 +64,19 @@ export const generatePDF = (character: Character) => {
     y += 15 + (splitSkills.length * 5);
 
     // Spells
-    if (character.spells && character.spells.spells.length > 0) {
+    if (character.spellcasting && character.spellcasting.spells.length > 0) {
         doc.setFontSize(14);
         doc.text("Magias", 20, y);
         doc.setFontSize(10);
         y += 8;
-        
-        const cantrips = character.spells.spells.filter(s => s.level === 0).map(s => s.name).join(', ');
+
+        const cantrips = character.spellcasting.spells.filter(s => s.level === 0).map(s => s.name).join(', ');
         if (cantrips) {
             doc.text(`Truques: ${cantrips}`, 20, y);
             y += 6;
         }
-        
-        const level1 = character.spells.spells.filter(s => s.level === 1).map(s => s.name).join(', ');
+
+        const level1 = character.spellcasting.spells.filter(s => s.level === 1).map(s => s.name).join(', ');
         if (level1) {
             doc.text(`Nível 1: ${level1}`, 20, y);
             y += 6;

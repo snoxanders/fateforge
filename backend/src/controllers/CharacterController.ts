@@ -6,14 +6,14 @@ export class CharacterController {
     
     static generate(req: Request, res: Response) {
         try {
-            const { name, level, method, raceId, classId } = req.body;
-            
+            const { name, level, method, raceId, classId, seed } = req.body;
+
             if (level < 1 || level > 20) {
                  res.status(400).json({ error: "Level must be between 1 and 20" });
                  return;
             }
 
-            const generator = new CharacterGeneratorService();
+            const generator = new CharacterGeneratorService(typeof seed === 'number' ? seed : undefined);
             const character = generator.generateCharacter(name || "Hero", { 
                 level, 
                 method,

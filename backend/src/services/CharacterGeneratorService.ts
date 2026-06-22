@@ -4,11 +4,18 @@ import { CLASSES } from '../data/classes';
 import { BACKGROUNDS, BackgroundData } from '../data/backgrounds';
 import { SKILLS_MAPPING } from '../data/skills';
 import { SPELLS } from '../data/spells';
-import { roll4d6DropLowest, getModifier } from '../utils/dice';
+import { roll4d6DropLowest, getModifier, mulberry32, RNG } from '../utils/dice';
 import { Race } from '../models/Race';
 import { Class, Subclass, ClassFeature } from '../models/Class';
 
 export class CharacterGeneratorService {
+
+  private rng: RNG;
+
+  // seed opcional -> geração reproduzível (testes determinísticos / compartilhar por seed)
+  constructor(seed?: number) {
+    this.rng = seed !== undefined ? mulberry32(seed) : Math.random;
+  }
 
   public generateCharacter(name: string, preferences: GenerationPreferences = {}): Character {
     const level = preferences.level || 1;
@@ -306,7 +313,7 @@ export class CharacterGeneratorService {
 
   private generateBio(race: Race, bg: BackgroundData, name: string, level: number): Bio {
       return {
-          age: 20 + Math.floor(Math.random() * 20),
+          age: 20 + Math.floor(this.rng() * 20),
           height: "1,75m",
           weight: "75kg",
           eyes: "Castanhos",
@@ -323,7 +330,7 @@ export class CharacterGeneratorService {
       const found = RACES.find(r => r.id === raceId);
       if (found) return found;
     }
-    return RACES[Math.floor(Math.random() * RACES.length)];
+    return RACES[Math.floor(this.rng() * RACES.length)];
   }
 
   private selectClass(classId?: string): Class {
@@ -331,11 +338,11 @@ export class CharacterGeneratorService {
       const found = CLASSES.find(c => c.id === classId);
       if (found) return found;
     }
-    return CLASSES[Math.floor(Math.random() * CLASSES.length)];
+    return CLASSES[Math.floor(this.rng() * CLASSES.length)];
   }
 
   private getRandomBackground(): BackgroundData {
-    return BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)];
+    return BACKGROUNDS[Math.floor(this.rng() * BACKGROUNDS.length)];
   }
   
   private generatePersonality(bg: BackgroundData): PersonalityTraits {
@@ -348,19 +355,43 @@ export class CharacterGeneratorService {
   }
 
   private pickOne<T>(arr: T[]): T {
-      return arr[Math.floor(Math.random() * arr.length)];
+      return arr[Math.floor(this.rng() * arr.length)];
   }
 
   private pickRandom<T>(arr: T[], count: number): T[] {
-    const shuffled = [...arr].sort(() => 0.5 - Math.random());
+    const shuffled = [...arr].sort(() => 0.5 - this.rng());
     return shuffled.slice(0, count);
   }
 
   private generateBaseStats(method: GenerationMethod): number[] {
     if (method === 'standard') return [15, 14, 13, 12, 10, 8];
+    if (method === 'point-buy') return this.pointBuyStats();
     const stats: number[] = [];
-    for (let i = 0; i < 6; i++) stats.push(roll4d6DropLowest());
+    for (let i = 0; i < 6; i++) stats.push(roll4d6DropLowest(this.rng));
     return stats.sort((a, b) => b - a);
+  }
+
+  // Compra de Pontos (27 pontos, PHB): valores 8-15 antes de bônus raciais.
+  // Sorteia uma distribuição válida; o assignStatsByClassPriority coloca os maiores nos atributos-chave.
+  private pointBuyStats(): number[] {
+    const cost: { [v: number]: number } = { 8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9 };
+    const values = [8, 8, 8, 8, 8, 8];
+    let budget = 27;
+    // Distribui o orçamento aleatoriamente respeitando o teto de 15 e o custo.
+    let guard = 0;
+    while (budget > 0 && guard++ < 1000) {
+      const i = Math.floor(this.rng() * 6);
+      const next = values[i] + 1;
+      if (next > 15) continue;
+      const delta = cost[next] - cost[values[i]];
+      if (delta <= budget) {
+        values[i] = next;
+        budget -= delta;
+      } else if (budget < 1) {
+        break;
+      }
+    }
+    return values.sort((a, b) => b - a);
   }
 
   private assignStatsByClassPriority(values: number[], charClass: Class): { [key: string]: number } {
@@ -402,7 +433,7 @@ export class CharacterGeneratorService {
   
   private generateRandomName(): string {
     const names = ["Tharivol", "Erevan", "Keth", "Murbella", "Dorn", "Zephyros", "Seraphina", "Grim", "Valeria", "Nyx"];
-    return names[Math.floor(Math.random() * names.length)];
+    return names[Math.floor(this.rng() * names.length)];
   }
 
   private calculateXP(level: number): number {
