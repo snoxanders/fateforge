@@ -18,7 +18,8 @@ export interface Class {
   };
   startingEquipment: string[];
   features: ClassFeature[];
-  subclasses?: Subclass[]; 
+  subclasses?: Subclass[];
+  subclassLevel?: number; // nível em que a subclasse é escolhida (padrão 3)
 }
 
 export interface Subclass {

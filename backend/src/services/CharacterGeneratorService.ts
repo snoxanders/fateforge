@@ -1,4 +1,4 @@
-import { Character, GenerationPreferences, GenerationMethod, Attributes, Skill, Spellcasting, EquipmentItem, Bio, CharacterBackground, PersonalityTraits } from '../models/Character';
+import { Character, GenerationPreferences, GenerationMethod, Attributes, Skill, Spellcasting, SpellSlot, EquipmentItem, Bio, CharacterBackground, PersonalityTraits } from '../models/Character';
 import { RACES } from '../data/races';
 import { CLASSES } from '../data/classes';
 import { BACKGROUNDS, BackgroundData } from '../data/backgrounds';
@@ -24,7 +24,9 @@ export class CharacterGeneratorService {
     let characterClass = this.selectClass(preferences.classId);
     let subclass: Subclass | undefined = undefined;
 
-    if (level >= 3 && characterClass.subclasses && characterClass.subclasses.length > 0) {
+    // Clérigo/Feiticeiro/Bruxo escolhem no nv1, Druida no nv2, demais no nv3.
+    const subclassLevel = characterClass.subclassLevel ?? 3;
+    if (level >= subclassLevel && characterClass.subclasses && characterClass.subclasses.length > 0) {
         subclass = this.pickRandom(characterClass.subclasses, 1)[0];
     }
 
@@ -46,7 +48,8 @@ export class CharacterGeneratorService {
         rawAttributes = this.applyASI(rawAttributes, characterClass, level);
     }
 
-    const attributes = this.calculateAttributes(rawAttributes, characterClass.proficiencies.savingThrows);
+    const proficiencyBonus = this.calculateProficiencyBonus(level);
+    const attributes = this.calculateAttributes(rawAttributes, characterClass.proficiencies.savingThrows, proficiencyBonus);
 
     const modifiers = {
         STR: attributes.STR.modifier,
@@ -58,8 +61,7 @@ export class CharacterGeneratorService {
     };
 
     const hp = this.calculateHP(characterClass, modifiers.CON, level, race);
-    const proficiencyBonus = this.calculateProficiencyBonus(level);
-    const initiative = modifiers.DEX; 
+    const initiative = modifiers.DEX;
     
     const bgData = this.getRandomBackground();
     const background: CharacterBackground = {
@@ -114,16 +116,17 @@ export class CharacterGeneratorService {
 
   // --- Helpers ---
 
-  private calculateAttributes(raw: { [key: string]: number }, saves: string[]): Attributes {
+  private calculateAttributes(raw: { [key: string]: number }, saves: string[], pb: number): Attributes {
       const stats = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
       const attrs: any = {};
-      
+
       stats.forEach(stat => {
           const value = raw[stat];
           const modifier = getModifier(value);
-          attrs[stat] = { value, modifier, save: modifier };
+          const proficient = saves.includes(stat);
+          attrs[stat] = { value, modifier, save: modifier + (proficient ? pb : 0) };
       });
-      return attrs as Attributes; 
+      return attrs as Attributes;
   }
 
   private calculateSkills(proficientSkills: string[], attributes: Attributes, pb: number): Skill[] {
@@ -275,40 +278,56 @@ export class CharacterGeneratorService {
   }
 
   private generateSpellcasting(charClass: Class, race: Race, level: number, attributes: Attributes, pb: number): Spellcasting | undefined {
-      if (!charClass.spellcasting) return undefined;
+      const sc = charClass.spellcasting;
+      if (!sc) return undefined;
 
-      const abilityKey = charClass.spellcasting.ability;
+      const abilityKey = sc.ability;
       const abilityMod = attributes[abilityKey].modifier;
       const saveDC = 8 + pb + abilityMod;
       const attackBonus = pb + abilityMod;
 
-      const spells: any[] = []; 
-      
-      if (charClass.spellcasting.cantripsKnown) {
-          const count = charClass.spellcasting.cantripsKnown[level] || 0;
-          const available = SPELLS.filter(s => s.classes.includes(charClass.id) && s.level === 0);
-          const picked = this.pickRandom(available, count);
-          spells.push(...picked.map(p => ({ ...p, prepared: true })));
+      // A tabela de slots já codifica full/half/pact corretamente -> é a fonte de verdade
+      // para QUANTO se conjura e qual o maior círculo disponível.
+      const slotMap = this.slotsForLevel(sc.slotsPerLevel, level);
+      const slots: SpellSlot[] = Object.keys(slotMap)
+          .map(k => parseInt(k))
+          .filter(lvl => slotMap[lvl] > 0)
+          .sort((a, b) => a - b)
+          .map(lvl => ({ level: lvl, total: slotMap[lvl], used: 0 }));
+      const maxSpellLevel = slots.length ? slots[slots.length - 1].level : 0;
+
+      const spells: any[] = [];
+
+      // Truques
+      const cantripCount = sc.cantripsKnown ? (sc.cantripsKnown[level] || 0) : 0;
+      if (cantripCount > 0) {
+          const availableCantrips = SPELLS.filter(s => s.classes.includes(charClass.id) && s.level === 0);
+          spells.push(...this.pickRandom(availableCantrips, cantripCount).map(p => ({ ...p, prepared: true })));
       }
 
-      let knownCount = 0;
-      if (charClass.spellcasting.knownSpellsPerLevel) {
-          knownCount = charClass.spellcasting.knownSpellsPerLevel[level] || level + abilityMod;
-      } else {
-          knownCount = level + abilityMod; 
+      // Sem espaços de magia neste nível: não é conjurador ainda (ex.: Paladino/Patrulheiro nv1).
+      if (maxSpellLevel === 0) {
+          if (spells.length === 0) return undefined; // nem truques -> sem aba de magia
+          return { ability: abilityKey, saveDC, attackBonus, slots, spells };
       }
-      
-      const availableLeveled = SPELLS.filter(s => s.classes.includes(charClass.id) && s.level > 0 && s.level <= Math.ceil(level/2));
-      const pickedLeveled = this.pickRandom(availableLeveled, Math.max(1, knownCount));
-      spells.push(...pickedLeveled.map(p => ({ ...p, prepared: true })));
 
-      return {
-          ability: abilityKey,
-          saveDC,
-          attackBonus,
-          slots: [], 
-          spells
-      };
+      // Magias de nível, limitadas ao maior círculo com espaço disponível.
+      let knownCount = sc.knownSpellsPerLevel
+          ? (sc.knownSpellsPerLevel[level] || level + abilityMod)
+          : level + abilityMod; // preparadas (Clérigo/Druida/Paladino)
+      knownCount = Math.max(1, knownCount);
+
+      const availableLeveled = SPELLS.filter(s => s.classes.includes(charClass.id) && s.level > 0 && s.level <= maxSpellLevel);
+      spells.push(...this.pickRandom(availableLeveled, knownCount).map(p => ({ ...p, prepared: true })));
+
+      return { ability: abilityKey, saveDC, attackBonus, slots, spells };
+  }
+
+  // Mapa de slots do nível; se o nível exato não estiver na tabela, usa o maior nível definido <= level.
+  private slotsForLevel(table: { [level: number]: { [spellLevel: number]: number } }, level: number): { [spellLevel: number]: number } {
+      if (table[level]) return table[level];
+      const defined = Object.keys(table).map(k => parseInt(k)).filter(l => l <= level).sort((a, b) => b - a);
+      return defined.length ? table[defined[0]] : {};
   }
 
   private generateBio(race: Race, bg: BackgroundData, name: string, level: number): Bio {
@@ -419,11 +438,33 @@ export class CharacterGeneratorService {
     return newStats;
   }
 
+  // Quantos ASIs a classe já recebeu até o nível atual.
+  private asiCount(charClass: Class, level: number): number {
+      const milestones = [4, 8, 12, 16, 19];
+      if (charClass.id === 'fighter') milestones.push(6, 14); // ASIs extras do Guerreiro
+      if (charClass.id === 'rogue') milestones.push(10);      // ASI extra do Ladino
+      return milestones.filter(m => level >= m).length;
+  }
+
   private applyASI(stats: any, charClass: Class, level: number): any {
-      const mainStat = charClass.statPriority[0];
       const newStats = { ...stats };
-      const increases = Math.floor(level / 4); 
-      newStats[mainStat] = Math.min(20, newStats[mainStat] + 2);
+      let points = this.asiCount(charClass, level) * 2; // +2 por marco de ASI
+      const priority = charClass.statPriority;
+      // Concentra no maior atributo prioritário abaixo de 20; sobra "transborda" pro próximo.
+      let guard = 0;
+      while (points > 0 && guard++ < 100) {
+          let applied = false;
+          for (const stat of priority) {
+              if (newStats[stat] < 20) {
+                  const add = Math.min(2, 20 - newStats[stat], points);
+                  newStats[stat] += add;
+                  points -= add;
+                  applied = true;
+                  break; // reavalia a prioridade a cada incremento
+              }
+          }
+          if (!applied) break; // todos no teto (20)
+      }
       return newStats;
   }
 

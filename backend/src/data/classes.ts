@@ -165,6 +165,7 @@ export const CLASSES: Class[] = [
     id: 'cleric',
     name: 'Clérigo',
     hitDie: 8,
+    subclassLevel: 1,
     statPriority: ['WIS', 'CON', 'STR', 'DEX', 'CHA', 'INT'],
     spellcasting: {
         ability: 'WIS',
@@ -398,6 +399,7 @@ export const CLASSES: Class[] = [
     id: 'sorcerer',
     name: 'Feiticeiro',
     hitDie: 6,
+    subclassLevel: 1,
     statPriority: ['CHA', 'CON', 'DEX', 'WIS', 'INT', 'STR'],
     spellcasting: {
         ability: 'CHA',
@@ -487,6 +489,7 @@ export const CLASSES: Class[] = [
     id: 'warlock',
     name: 'Bruxo',
     hitDie: 8,
+    subclassLevel: 1,
     statPriority: ['CHA', 'CON', 'DEX', 'WIS', 'INT', 'STR'],
     spellcasting: {
         ability: 'CHA',
@@ -533,6 +536,7 @@ export const CLASSES: Class[] = [
     id: 'druid',
     name: 'Druida',
     hitDie: 8,
+    subclassLevel: 2,
     statPriority: ['WIS', 'CON', 'DEX', 'STR', 'INT', 'CHA'],
     spellcasting: {
         ability: 'WIS',
