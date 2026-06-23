@@ -154,7 +154,7 @@ export const generatePDF = async (character: Character) => {
   y += 2;
 
   // ===== Magias =====
-  if (character.spellcasting && character.spellcasting.spells.length > 0) {
+  if (character.spellcasting && character.spellcasting.spells && character.spellcasting.spells.length > 0) {
     const sc = character.spellcasting;
     section('Magias');
     para(`Atributo ${sc.ability}   ·   CD de Resistência ${sc.saveDC}   ·   Ataque ${mod(sc.attackBonus)}`, { bold: true });

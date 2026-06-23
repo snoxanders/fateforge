@@ -28,7 +28,7 @@ export class DatabaseService {
         proficiencies: JSON.stringify(character.proficiencies),
         equipment: JSON.stringify(character.equipment),
         wallet: JSON.stringify(character.wallet),
-        spells: JSON.stringify(character.spellcasting || {}),
+        spells: JSON.stringify(character.spellcasting || null),
         
         background: JSON.stringify(character.background),
         personality: JSON.stringify(character.personality),

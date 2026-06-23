@@ -1,6 +1,8 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import axios from 'axios';
-import { Dice5, RefreshCw, Users, Plus, SlidersHorizontal, Sword, Download, Trash2, ScrollText } from 'lucide-react';
+import { Dice5, RefreshCw, Users, Plus, SlidersHorizontal, Download, Trash2, ScrollText } from 'lucide-react';
+import { App as CapApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginButton } from './components/LoginButton';
 import { CharacterSheet, Character } from './components/CharacterSheet';
@@ -42,6 +44,16 @@ function CharvoApp() {
     if (user) fetchLibrary();
     else setSavedCharacters([]);
   }, [user]);
+
+  // Botão/gesto "voltar" do Android: do Grimório volta pro Gerador; no Gerador, sai do app.
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    const handle = CapApp.addListener('backButton', () => {
+      if (activeTab === 'library') setActiveTab('generator');
+      else CapApp.exitApp();
+    });
+    return () => { handle.then((h) => h.remove()); };
+  }, [activeTab]);
 
   const fetchLibrary = async () => {
     if (!user) return;
@@ -115,9 +127,12 @@ function CharvoApp() {
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-stone-800/80 bg-stone-950/85 pt-safe backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
-          <div className="flex items-center gap-2 font-serif text-xl font-bold tracking-wide text-amber-500">
+          <button
+            onClick={() => setActiveTab('generator')}
+            className="flex items-center gap-2 font-serif text-xl font-bold tracking-wide text-amber-500 active:opacity-70"
+          >
             <Dice5 size={22} className="text-amber-600" /> Charvo
-          </div>
+          </button>
           <LoginButton />
         </div>
       </header>
@@ -223,7 +238,11 @@ function CharvoApp() {
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {savedCharacters.map((char) => (
-                  <div key={char.id} className="rounded-2xl border border-stone-800 bg-stone-900/70 p-3">
+                  <div
+                    key={char.id}
+                    onClick={() => handleLoad(char)}
+                    className="cursor-pointer rounded-2xl border border-stone-800 bg-stone-900/70 p-3 transition active:border-amber-600/60 active:bg-stone-900"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-stone-700 bg-stone-950">
                         <img src={getAvatarUrl(char.race.name, char.name)} alt="" className="h-full w-full object-cover object-top" />
@@ -234,10 +253,12 @@ function CharvoApp() {
                         <p className="text-xs font-bold text-amber-700/90">Nível {char.level}</p>
                       </div>
                     </div>
-                    <div className="mt-3 flex justify-end gap-2 border-t border-stone-800/60 pt-3">
-                      <button onClick={() => handleLoad(char)} className="rounded-lg p-2 text-stone-400 active:bg-stone-800 active:text-amber-500" title="Abrir"><Sword size={18} /></button>
-                      <button onClick={() => handleExportPDF(char)} className="rounded-lg p-2 text-stone-400 active:bg-stone-800 active:text-stone-200" title="PDF"><Download size={18} /></button>
-                      <button onClick={() => handleDelete(char.id!)} className="rounded-lg p-2 text-stone-400 active:bg-red-950/40 active:text-red-500" title="Excluir"><Trash2 size={18} /></button>
+                    <div className="mt-3 flex items-center justify-between border-t border-stone-800/60 pt-3">
+                      <span className="text-[11px] text-stone-600">Toque para abrir</span>
+                      <div className="flex gap-2">
+                        <button onClick={(e) => { e.stopPropagation(); handleExportPDF(char); }} className="rounded-lg p-2 text-stone-400 active:bg-stone-800 active:text-stone-200" title="PDF"><Download size={18} /></button>
+                        <button onClick={(e) => { e.stopPropagation(); handleDelete(char.id!); }} className="rounded-lg p-2 text-stone-400 active:bg-red-950/40 active:text-red-500" title="Excluir"><Trash2 size={18} /></button>
+                      </div>
                     </div>
                   </div>
                 ))}
