@@ -11,3 +11,8 @@ backend/frontend/dist
 backend/frontend/.env
 backend/frontend/.env.local
 project_requirements.md
+
+# Conteudo protegido / nao versionar
+*.pdf
+livro_do_jogador_completo.txt
+dd-5e-livro-do-jogador*
