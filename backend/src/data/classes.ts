@@ -74,10 +74,10 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'battle-master',
-            name: 'Mestre de Batalha',
-            description: 'Você emprega manobras marciais aprendidas com o domínio de técnicas de combate.',
+            name: 'Mestre das Manobras',
+            description: 'Você transforma o combate em arte e cálculo, executando técnicas precisas no momento certo.',
             features: [
-                { name: 'Manobras de Combate', level: 3, description: 'Você aprende manobras alimentadas por dados de superioridade (d8) para controlar o campo de batalha.' }
+                { name: 'Manobras Marciais', level: 3, description: 'Você domina manobras especiais, alimentadas por dados de manobra, para desarmar, derrubar e controlar inimigos.' }
             ]
         }
     ]
@@ -126,10 +126,10 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'school-abjuration',
-            name: 'Escola de Abjuração',
-            description: 'Você foca no estudo da magia de proteção, bloqueio e banimento.',
+            name: 'Guardião Arcano',
+            description: 'Você canaliza a magia para proteger e repelir, erguendo barreiras contra qualquer ameaça.',
             features: [
-                { name: 'Proteção Arcana', level: 2, description: 'Você cria uma barreira mágica que absorve dano e se recarrega ao conjurar magias de abjuração.' }
+                { name: 'Égide Arcana', level: 2, description: 'Você projeta um escudo de energia que absorve dano e se renova conforme você conjura suas magias.' }
             ]
         }
     ]
@@ -177,10 +177,10 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'assassin',
-            name: 'Assassino',
-            description: 'Você foca na arte sombria de tirar vidas, especializando-se em disfarce, veneno e o golpe mortal.',
+            name: 'Lâmina Silenciosa',
+            description: 'Você é mestre do disfarce e do bote certeiro, eliminando alvos antes que percebam o perigo.',
             features: [
-                { name: 'Assassinar', level: 3, description: 'Você tem vantagem contra criaturas que ainda não agiram; qualquer acerto contra um alvo surpreso é crítico.' }
+                { name: 'Golpe Mortal', level: 3, description: 'Você ataca com vantagem quem ainda não agiu, e seus acertos contra alvos surpresos são devastadores.' }
             ]
         }
     ]
@@ -232,11 +232,11 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'war-domain',
-            name: 'Domínio da Guerra',
-            description: 'O domínio da Guerra é dedicado a deuses do combate, da honra e da vitória nas batalhas.',
+            name: 'Aspecto Bélico',
+            description: 'Sua fé é forjada em batalha; você abençoa aliados e esmaga inimigos em nome da sua causa.',
             features: [
-                { name: 'Sacerdote de Guerra', level: 1, description: 'Sua divindade lhe concede ataques bônus em combate, baseados no seu modificador de Sabedoria.' },
-                { name: 'Canalizar Divindade: Ataque Guiado', level: 2, description: 'Você pode usar Canalizar Divindade para garantir vantagem em uma jogada de ataque.' }
+                { name: 'Bênção do Combatente', level: 1, description: 'Sua devoção concede ataques adicionais em combate, conforme sua Sabedoria.' },
+                { name: 'Canalizar Divindade: Golpe Guiado', level: 2, description: 'Você invoca poder divino para garantir vantagem em uma jogada de ataque.' }
             ]
         }
     ]
@@ -290,11 +290,11 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'college-valor',
-            name: 'Colégio da Bravura',
-            description: 'Bardos do Colégio da Bravura são contadores de histórias corajosos que inspiram heróis em batalha.',
+            name: 'Trovador de Guerra',
+            description: 'Você canta as sagas dos heróis e inspira coragem no calor da batalha, lutando ao lado dos seus.',
             features: [
-                { name: 'Proficiências Bônus', level: 3, description: 'Você ganha proficiência em armaduras médias, escudos e armas marciais.' },
-                { name: 'Inspiração de Combate', level: 3, description: 'Aliados podem usar sua Inspiração de Bardo para adicionar o dado ao dano ou à CA.' }
+                { name: 'Treino Marcial', level: 3, description: 'Você ganha proficiência em armaduras médias, escudos e armas marciais.' },
+                { name: 'Inspiração Heroica', level: 3, description: 'Aliados podem gastar sua Inspiração para reforçar o dano de um golpe ou a própria defesa.' }
             ]
         }
     ]
@@ -348,10 +348,10 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'oath-ancients',
-            name: 'Juramento dos Anciões',
-            description: 'O Juramento dos Anciões vincula o paladino aos princípios eternos do bem e da luz contra a escuridão.',
+            name: 'Juramento da Alvorada',
+            description: 'Você jura preservar a luz e a vida do mundo, opondo-se a toda escuridão que tente apagá-las.',
             features: [
-                { name: 'Canalizar Divindade: Fúria da Natureza', level: 3, description: 'Você invoca raízes e vinhas espectrais para prender seus inimigos.' }
+                { name: 'Canalizar Divindade: Vinhas Vingadoras', level: 3, description: 'Você conjura raízes e vinhas espectrais que prendem seus inimigos no lugar.' }
             ]
         }
     ]
@@ -398,10 +398,10 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'path-totem',
-            name: 'Caminho do Guerreiro Totêmico',
-            description: 'Você adota um espírito animal como guia, protetor e inspiração.',
+            name: 'Senda do Espírito Selvagem',
+            description: 'Você se conecta a um espírito animal ancestral que guia e fortalece sua fúria.',
             features: [
-                { name: 'Espírito Totêmico', level: 3, description: 'Escolha um animal totêmico (Urso, Águia, Lobo) e ganhe um benefício relacionado durante a fúria.' }
+                { name: 'Espírito Guardião', level: 3, description: 'Escolha um espírito animal (Urso, Águia ou Lobo) e ganhe um poder ligado a ele durante a fúria.' }
             ]
         }
     ]
@@ -453,10 +453,10 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'beast-master',
-            name: 'Mestre das Feras',
-            description: 'Você forma um vínculo místico com um companheiro animal que luta ao seu lado.',
+            name: 'Vínculo Selvagem',
+            description: 'Você firma um laço profundo com uma criatura que caça e luta lado a lado com você.',
             features: [
-                { name: 'Companheiro Animal', level: 3, description: 'Você ganha uma besta companheira que age conforme suas ordens em combate.' }
+                { name: 'Companheiro de Caça', level: 3, description: 'Você ganha uma besta aliada que obedece às suas ordens em combate.' }
             ]
         }
     ]
@@ -508,10 +508,10 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'wild-magic',
-            name: 'Magia Selvagem',
-            description: 'Sua magia provém do caos imprevisível das forças primordiais do multiverso.',
+            name: 'Origem Caótica',
+            description: 'Sua magia nasce de forças primordiais instáveis, e às vezes escapa ao seu controle.',
             features: [
-                { name: 'Surto de Magia Selvagem', level: 1, description: 'Sua magia pode disparar efeitos aleatórios e caóticos quando você conjura magias.' }
+                { name: 'Surto Caótico', level: 1, description: 'Ao conjurar, sua magia pode disparar efeitos mágicos aleatórios e imprevisíveis.' }
             ]
         }
     ]
@@ -559,10 +559,10 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'shadow',
-            name: 'Caminho das Sombras',
-            description: 'Monges deste caminho seguem uma tradição que valoriza o sigilo e a furtividade nas sombras.',
+            name: 'Senda Umbral',
+            description: 'Você treina nas tradições do silêncio e da escuridão, movendo-se como uma sombra viva.',
             features: [
-                { name: 'Artes das Sombras', level: 3, description: 'Você pode gastar ki para conjurar magias de sombra como escuridão, passos silenciosos e visão no escuro.' }
+                { name: 'Artes Umbrais', level: 3, description: 'Você gasta ki para criar escuridão, silêncio e enxergar no escuro, dominando as sombras.' }
             ]
         }
     ]
@@ -614,10 +614,10 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'archfey',
-            name: 'O Arquifada',
-            description: 'Seu patrono é um lorde ou dama das fadas, um ser de magia antiga e caprichos imprevisíveis.',
+            name: 'Pacto Feérico',
+            description: 'Seu patrono é um senhor das fadas, ser de magia antiga, beleza enganosa e caprichos perigosos.',
             features: [
-                { name: 'Presença Feérica', level: 1, description: 'Você pode encantar ou amedrontar as criaturas ao seu redor com a magia da corte feérica.' }
+                { name: 'Presença Encantadora', level: 1, description: 'Você encanta ou amedronta as criaturas ao redor com a magia sedutora da corte das fadas.' }
             ]
         }
     ]
@@ -669,10 +669,10 @@ export const CLASSES: Class[] = [
         },
         {
             id: 'circle-moon',
-            name: 'Círculo da Lua',
-            description: 'Druidas do Círculo da Lua são guardiões ferozes que dominam a Forma Selvagem para o combate.',
+            name: 'Círculo da Fera',
+            description: 'Você domina a transformação em feras poderosas, tornando-se um predador no campo de batalha.',
             features: [
-                { name: 'Forma de Combate', level: 2, description: 'Você pode assumir formas de bestas mais poderosas e usar Forma Selvagem como ação bônus.' }
+                { name: 'Forma de Combate', level: 2, description: 'Você assume formas de bestas mais fortes e ativa a Forma Selvagem como ação bônus.' }
             ]
         }
     ]
