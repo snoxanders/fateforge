@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="80%">
+      <stop offset="0%" stop-color="#2a2522"/>
+      <stop offset="55%" stop-color="#141210"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="46%" r="42%">
+      <stop offset="0%" stop-color="#d97706" stop-opacity="0.40"/>
+      <stop offset="100%" stop-color="#d97706" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="#ffe28a"/>
+      <stop offset="100%" stop-color="#e8a92a"/>
+    </linearGradient>
+    <linearGradient id="left" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cf8c20"/>
+      <stop offset="100%" stop-color="#996114"/>
+    </linearGradient>
+    <linearGradient id="right" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9c6a16"/>
+      <stop offset="100%" stop-color="#6f470d"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#glow)"/>
+
+  <!-- dado isométrico -->
+  <g stroke="#4a2f0b" stroke-width="7" stroke-linejoin="round">
+    <polygon points="512,232 792,392 512,552 232,392" fill="url(#top)"/>
+    <polygon points="232,392 512,552 512,832 232,672" fill="url(#left)"/>
+    <polygon points="792,392 512,552 512,832 792,672" fill="url(#right)"/>
+  </g>
+
+  <!-- brilho na aresta superior -->
+  <polyline points="232,392 512,232 792,392" fill="none" stroke="#fff1c4" stroke-width="5" stroke-opacity="0.5" stroke-linejoin="round"/>
+
+  <!-- pips -->
+  <g fill="#3a2408">
+    <circle cx="512" cy="392" r="36"/>
+    <circle cx="330" cy="540" r="29"/>
+    <circle cx="414" cy="686" r="29"/>
+    <circle cx="720" cy="505" r="27"/>
+    <circle cx="652" cy="612" r="27"/>
+    <circle cx="584" cy="719" r="27"/>
+  </g>
+</svg>
