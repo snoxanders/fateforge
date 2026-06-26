@@ -16,3 +16,8 @@ project_requirements.md
 *.pdf
 livro_do_jogador_completo.txt
 dd-5e-livro-do-jogador*
+
+# Assinatura Android (NUNCA versionar)
+*.jks
+*.keystore
+keystore.properties
