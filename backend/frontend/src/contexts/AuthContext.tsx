@@ -45,6 +45,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (NATIVE) {
             const handlePromise = App.addListener('appUrlOpen', async ({ url }) => {
                 if (!url || !url.includes('auth')) return;
+                // fecha o navegador do sistema (fluxo do Google) ao voltar pro app
+                try { const { Browser } = await import('@capacitor/browser'); await Browser.close(); } catch { /* noop */ }
                 try {
                     const hash = url.split('#')[1];
                     if (hash) {
@@ -72,11 +74,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const signInWithGoogle = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: { redirectTo: REDIRECT_TO }
-        });
-        if (error) console.error("Login error:", error);
+        if (NATIVE) {
+            // No app: abre o login do Google no navegador do sistema e volta via deep link.
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: REDIRECT_TO, skipBrowserRedirect: true },
+            });
+            if (error) { console.error('Login error:', error); return; }
+            if (data?.url) {
+                const { Browser } = await import('@capacitor/browser');
+                await Browser.open({ url: data.url });
+            }
+        } else {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: REDIRECT_TO },
+            });
+            if (error) console.error('Login error:', error);
+        }
     };
 
     const signInWithEmail = async (email: string) => {
