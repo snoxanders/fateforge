@@ -1,6 +1,0 @@
-Coloque aqui as imagens das raças (geradas por você, ex.: ChatGPT).
-Formato: PNG quadrado. Nomes exatos dos arquivos:
-human.png, high-elf.png, wood-elf.png, dark-elf.png, hill-dwarf.png,
-mountain-dwarf.png, lightfoot-halfling.png, stout-halfling.png, half-orc.png,
-tiefling.png, rock-gnome.png, forest-gnome.png, half-elf.png, dragonborn.png
-Se faltar alguma, o app mostra o emblema com ícone automaticamente.

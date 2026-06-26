@@ -52,7 +52,7 @@ export function RaceAvatar({ name, size = 'lg', className = '' }: RaceAvatarProp
       {/* Imagem da raça (se existir) cobre o emblema */}
       {showImg && (
         <img
-          src={`/assets/races/${entry.file}.png`}
+          src={`/assets/races/${entry.file}.jpg`}
           alt={name}
           onError={() => setImgFailed(true)}
           className="absolute inset-0 h-full w-full object-cover object-top"
